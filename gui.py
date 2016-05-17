@@ -227,6 +227,8 @@ class Gui(object):
 
         pygame.init()
 
+        self.clf = Classify()
+
         self.click_func = False
         self.init = False
 
