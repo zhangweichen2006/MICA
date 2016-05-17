@@ -6,6 +6,8 @@ from pygame.locals import *
 from pygame import *
 import MenuSystem
 
+from instrument.classify import Classify
+
 # Background Setup
 BACKGROUND_IMG = 'python4.jpg'
 DISPLAY_WIDTH = 800
