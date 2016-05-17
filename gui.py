@@ -203,16 +203,50 @@ class Gui(object):
 
         # Searching functionality:
         if self.B_bar_func == 0:
-            if self.S_bar_func == 1:
+            if self.S_bar_func is 0:
+                print "HELLO WORLD"
+                self.click_func = False
+
+            elif self.S_bar_func is 1:
                 self.gameDisplay.fill(WHITE)
                 self.record_screenloop()
                 self.loop_record()
                 self.stop_record()
                 self.set_back_button()
+
+            elif self.S_bar_func is 2:
+                print "HELLO WORLD"
+                self.click_func = False
+
+        # instrument
+        elif self.B_bar_func == 1:
+            if self.S_bar_func is 0:
+                print "HELLO WORLD"
+                self.click_func = False
+            elif self.S_bar_func is 1:
+                print "HELLO WORLD"
+                self.click_func = False
+            elif self.S_bar_func is 2:
+                print "HELLO WORLD"
+                self.click_func = False
+
+        # Similarity
+        elif self.B_bar_func == 2:
+            if self.S_bar_func is 0:
+                print "HELLO WORLD"
+                self.click_func = False
+            elif self.S_bar_func is 1:
+                print "HELLO WORLD"
+                self.click_func = False
+
+        # System
         elif self.B_bar_func == 3:
             if self.S_bar_func == 0:
                 sys.exit(0)
-
+            elif self.S_bar_func is 1:
+                print "HELLO WORLD"
+                self.click_func = False
+                
         # # Recognizing Functionality:
         # if self.B_bar_func == 1:
         #     if self.S_bar_func == 0:
