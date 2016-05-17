@@ -1,13 +1,16 @@
 import pyaudio
 import wave
 
-import pygame, sys
+import pygame, sys, glob
 from pygame.locals import *
 from pygame import *
 from MenuSystem import MenuSystem
+from os import listdir
+from os.path import isfile, join
+from PIL import Image
 
 from instrument.classify import Classify
-# from gif import GIFImage
+from gif import GIFImage
 
 
 # Background Setup
@@ -31,6 +34,7 @@ WHITE = (255,255,255)
 RED = (200,0,0)
 GREEN = (0,200,0)
 GRAY = (128,128,128)
+BLUE = (25,25,112)
 BRIGHT_RED = (255,0,0)
 BRIGHT_GREEN = (0,255,0)
 BRIGHT_GRAY = (160,160,160)
@@ -49,10 +53,23 @@ STOP_Y = 50
 STOP_WIDTH = 80
 STOP_HEIGHT = 40
 
+CLF_X = 740
+CLF_Y = 50
+CLF_WIDTH = 80
+CLF_HEIGHT = 40
+
 BACK_X = 50
 BACK_Y = 50
 BACK_WIDTH = 80
 BACK_HEIGHT = 40
+
+# sound wave jif
+# WAVES = [Image.open(join(WAVE_PATH, f)) for f in listdir(WAVE_PATH) if isfile(join(WAVE_PATH, f)) and "wave" in f]
+# IMG = [pygame.Surface.fromstring(w, (220,60), "P") for w in WAVES]
+
+# print WAVES
+# print IMG
+# pygame.transform.scale(pygame.image.load(w), (600, 70))
 
 class Gui(object):
 
@@ -64,6 +81,10 @@ class Gui(object):
         # background setup
         pygame.display.set_caption('Music Identification and Classification Application (MICA)')
         bg = image.load(BACKGROUND_IMG)
+
+        self.imgwave_x, self.imgwave_y = bg.get_size()[0] / 2 - self.imgwave_x / 2,\
+                                         bg.get_size()[1] / 2 - self.imgwave_y / 2
+
         self.gameDisplay = display.set_mode(bg.get_size())
         self.scrrect = self.gameDisplay.blit(bg,(0,0))
         display.flip()
@@ -96,37 +117,47 @@ class Gui(object):
         # self.exit_button.set()
 
     def record_screenloop(self):
+
+        smallText = pygame.font.Font(FONT,16)
+
         # mouse on GREEN show record button
         if RECORD_X+RECORD_WIDTH > self.mouse[0] > RECORD_X and RECORD_Y+RECORD_HEIGHT > self.mouse[1] > RECORD_Y:
-            pygame.draw.rect(self.gameDisplay, BRIGHT_GRAY,(RECORD_X,RECORD_Y,RECORD_WIDTH,RECORD_HEIGHT))
+            pygame.draw.rect(self.gameDisplay, BRIGHT_RED,(RECORD_X,RECORD_Y,RECORD_WIDTH,RECORD_HEIGHT))
+            textRecord, recRect = self.text_objects("Record", smallText, BLACK)
             if self.click[0] == 1 :
                 if self.recording == False:
                     self.open_record()
                     self.recording = True  
                 self.record_once = True
         else:
-            pygame.draw.rect(self.gameDisplay, GRAY,(RECORD_X,RECORD_Y,RECORD_WIDTH,RECORD_HEIGHT))
+            pygame.draw.rect(self.gameDisplay, BRIGHT_RED,(RECORD_X,RECORD_Y,RECORD_WIDTH,RECORD_HEIGHT), 1)
+            textRecord, recRect = self.text_objects("Record", smallText, BRIGHT_RED)
 
-        smallText = pygame.font.Font(FONT,16)
-        textRecord, recRect = self.text_objects("Record", smallText, BRIGHT_RED)
+        
+        
         recRect.center = ( (RECORD_X+(RECORD_WIDTH/2)), (RECORD_Y+(RECORD_HEIGHT/2)) )
         self.gameDisplay.blit(textRecord, recRect)
 
         # mouse on RED stop record button
         if STOP_X+STOP_WIDTH > self.mouse[0] > STOP_X and STOP_Y+STOP_HEIGHT > self.mouse[1] > STOP_Y:
             pygame.draw.rect(self.gameDisplay, BRIGHT_GRAY,(STOP_X,STOP_Y,STOP_WIDTH,STOP_HEIGHT))
+            textStop, stopRect = self.text_objects("Stop", smallText, BLACK)
         else:
-            pygame.draw.rect(self.gameDisplay, GRAY,(STOP_X,STOP_Y,STOP_WIDTH,STOP_HEIGHT)) 
+            pygame.draw.rect(self.gameDisplay, BRIGHT_GRAY,(STOP_X,STOP_Y,STOP_WIDTH,STOP_HEIGHT), 1) 
+            textStop, stopRect = self.text_objects("Stop", smallText, BRIGHT_GRAY)
 
-        textStop, stopRect = self.text_objects("Stop", smallText, BLACK)
+        
         stopRect.center = ((STOP_X+(STOP_WIDTH/2)), (STOP_Y+(STOP_HEIGHT/2)) )
         self.gameDisplay.blit(textStop, stopRect)
+
+        
 
     def set_recording_variables(self):
         # recording variables setup
         self.recording = False
         self.record_once = False
         self.p = pyaudio.PyAudio()
+
 
     def open_record(self):
         # initialise recording
@@ -138,17 +169,17 @@ class Gui(object):
             frames_per_buffer=CHUNK)
         self.frames = []
 
+
     def loop_record(self):
         # start recording
-        # screen = pygame.display.set_mode((640, 480))
-        # wave = GIFImage("resource/wave.gif")
-        # wave.get_frames()
-        # print wave.frames
         if self.recording:
             print("* recording")
-
+            self.imgwave.render(self.gameDisplay, (self.imgwave_x,self.imgwave_y))
             data = self.stream.read(CHUNK)
             self.frames.append(data)
+        else:
+            self.gameDisplay.blit(self.imgwave.frames[0][0], (self.imgwave_x,self.imgwave_y))
+
 
     def stop_record(self):
         #stop recording
@@ -166,6 +197,10 @@ class Gui(object):
                 self.wf.writeframes(b''.join(self.frames))
                 
                 self.recording = False
+                smallText = pygame.font.Font(FONT,16)
+                text_clf, clf_rect = self.text_objects("Classify", smallText, HALF_DARK_BLUE)
+                clf_rect.center = ( (CLF_X+(CLF_WIDTH/2)), (CLF_Y+(CLF_HEIGHT/2)) )
+                self.gameDisplay.blit(text_clf, clf_rect)
                 # break
 
             if event.type == QUIT:
@@ -174,6 +209,9 @@ class Gui(object):
                     self.wf.close()
                 pygame.quit(); 
                 sys.exit()
+
+            # show the classifying button
+            
 
     def set_menu_bar(self):
         self.ev = event.wait()
@@ -193,6 +231,7 @@ class Gui(object):
                 print(self.B_bar_func, self.S_bar_func)
                 self.click_func = True
 
+
     def set_back_button(self):
 
         if BACK_X+BACK_WIDTH > self.mouse[0] > BACK_X and BACK_Y+BACK_HEIGHT > self.mouse[1] > BACK_Y:
@@ -207,6 +246,23 @@ class Gui(object):
         textBack, recBack = self.text_objects("Back", smallText, WHITE)
         recBack.center = ((BACK_X+(BACK_WIDTH/2)), (BACK_Y+(BACK_HEIGHT/2)) )
         self.gameDisplay.blit(textBack, recBack)
+
+
+    def set_classify(self):
+        smallText = pygame.font.Font(FONT,16)
+
+        if CLF_X+CLF_WIDTH > self.mouse[0] > CLF_X and CLF_Y+CLF_HEIGHT > self.mouse[1] > CLF_Y:
+            pygame.draw.rect(self.gameDisplay, BRIGHT_BLUE,(CLF_X,CLF_Y,CLF_WIDTH,CLF_HEIGHT))
+            text_clf, clf_rect = self.text_objects("Classify", smallText, BLACK)
+        else:
+            pygame.draw.rect(self.gameDisplay, BRIGHT_BLUE,(CLF_X,CLF_Y,CLF_WIDTH,CLF_HEIGHT), 1) 
+            text_clf, clf_rect = self.text_objects("Classify", smallText, BRIGHT_BLUE)
+
+        
+        
+        clf_rect.center = ((CLF_X+(CLF_WIDTH/2)), (CLF_Y+(CLF_HEIGHT/2)) )
+        self.gameDisplay.blit(text_clf, clf_rect)
+
 
     def set_functionality_screen(self):
 
@@ -233,9 +289,16 @@ class Gui(object):
             if self.S_bar_func is 0:
                 print "HELLO WORLD"
                 self.click_func = False
+
             elif self.S_bar_func is 1:
-                print "HELLO WORLD"
-                self.click_func = False
+                self.gameDisplay.fill(BLACK)
+                self.record_screenloop()
+                self.loop_record()
+                self.stop_record()
+                self.set_classify()
+                self.set_back_button()
+
+
             elif self.S_bar_func is 2:
                 print "HELLO WORLD"
                 self.click_func = False
@@ -272,9 +335,12 @@ class Gui(object):
         pygame.init()
 
         self.clf = Classify()
-
         self.click_func = False
         self.init = False
+
+        self.imgwave = GIFImage("resource/wave1.gif")
+        self.imgwave_x, self.imgwave_y = self.imgwave.image.size
+        
 
 
     def main_loop(self):
