@@ -63,6 +63,7 @@ class Gui(object):
         display.flip()
 
     def initialise_menu(self):
+        
         # initialise menu system
         MenuSystem.init()
         MenuSystem.BGCOLOR = Color(200,200,200,80)
@@ -71,20 +72,22 @@ class Gui(object):
         MenuSystem.BORDER_HL = Color(200,200,200,180)
 
         # create menu
-        self.search_menu  = MenuSystem.Menu('Search',      ('Search with File','Search with Mic','About Search'))
-        self.recognize_menu = MenuSystem.Menu('Recognize',    ('Recognize with File','Recognize with Mic','About Recognize'))
-        self.accuracy_check_menu   = MenuSystem.Menu('Check',    ('Accuracy Check','About Accuracy Check'))
 
+        self.search_menu  = MenuSystem.Menu('Search',      ('Search with File','Search with Mic','About Search'))
+        self.recognize_menu = MenuSystem.Menu('Instrument',    ('Recognize with File','Recognize with Mic','About Recognize'))
+        self.accuracy_check_menu   = MenuSystem.Menu('Similarity',    ('Accuracy Check','About Accuracy Check'))
+        self.exit = MenuSystem.Menu('System', ('Exit', 'About us'))
+        
         # create bars
         self.bar = MenuSystem.MenuBar()
-        self.bar.set((self.search_menu,self.recognize_menu,self.accuracy_check_menu))
+        self.bar.set((self.search_menu, self.recognize_menu, self.accuracy_check_menu, self.exit))
         display.update(self.bar)
 
         self.ms = MenuSystem.MenuSystem()
 
-        self.exit_button = MenuSystem.Button('EXIT',100,30)
-        self.exit_button.bottomright =  self.scrrect.w-20,self.scrrect.h-20
-        self.exit_button.set()
+        # self.exit_button = MenuSystem.Button('EXIT',100,30)
+        # self.exit_button.bottomright =  self.scrrect.w-20,self.scrrect.h-20
+        # self.exit_button.set()
 
     def record_screenloop(self):
         # mouse on GREEN show record button
@@ -198,12 +201,16 @@ class Gui(object):
 
         # Searching functionality:
         if self.B_bar_func == 0:
-            if self.S_bar_func == 0:
+            if self.S_bar_func == 1:
                 self.gameDisplay.fill(WHITE)
                 self.record_screenloop()
                 self.loop_record()
                 self.stop_record()
                 self.set_back_button()
+        elif self.B_bar_func == 3:
+            if self.S_bar_func == 0:
+                sys.exit(0)
+
         # # Recognizing Functionality:
         # if self.B_bar_func == 1:
         #     if self.S_bar_func == 0:
@@ -241,8 +248,8 @@ class Gui(object):
                 # set menu bar
                 self.set_menu_bar()
                 # exit the app
-                if self.exit_button.update(self.ev):
-                    if self.exit_button.clicked: break
+                # if self.exit_button.update(self.ev):
+                #     if self.exit_button.clicked: break
                 display.flip()
             else:
                 self.set_functionality_screen()
