@@ -4,14 +4,18 @@ import wave
 import pygame, sys
 from pygame.locals import *
 from pygame import *
-import MenuSystem
+from MenuSystem import MenuSystem
 
 from instrument.classify import Classify
+# from gif import GIFImage
+
 
 # Background Setup
-BACKGROUND_IMG = 'python4.jpg'
+BACKGROUND_IMG = 'resource/python4.jpg'
 DISPLAY_WIDTH = 800
 DISPLAY_HEIGHT = 600
+
+FONT = "MenuSystem/Roboto-Regular.ttf"
 
 # Recording Configs
 CHUNK = 2048
@@ -103,7 +107,7 @@ class Gui(object):
         else:
             pygame.draw.rect(self.gameDisplay, GRAY,(RECORD_X,RECORD_Y,RECORD_WIDTH,RECORD_HEIGHT))
 
-        smallText = pygame.font.Font("Roboto-Regular.ttf",16)
+        smallText = pygame.font.Font(FONT,16)
         textRecord, recRect = self.text_objects("Record", smallText, BRIGHT_RED)
         recRect.center = ( (RECORD_X+(RECORD_WIDTH/2)), (RECORD_Y+(RECORD_HEIGHT/2)) )
         self.gameDisplay.blit(textRecord, recRect)
@@ -136,8 +140,13 @@ class Gui(object):
 
     def loop_record(self):
         # start recording
+        # screen = pygame.display.set_mode((640, 480))
+        # wave = GIFImage("resource/wave.gif")
+        # wave.get_frames()
+        # print wave.frames
         if self.recording:
             print("* recording")
+
             data = self.stream.read(CHUNK)
             self.frames.append(data)
 
@@ -194,7 +203,7 @@ class Gui(object):
         else:
             pygame.draw.rect(self.gameDisplay, BRIGHT_GRAY,(BACK_X,BACK_Y,BACK_WIDTH,BACK_HEIGHT))
 
-        smallText = pygame.font.Font("Roboto-Regular.ttf",16)
+        smallText = pygame.font.Font(FONT,16)
         textBack, recBack = self.text_objects("Back", smallText, WHITE)
         recBack.center = ((BACK_X+(BACK_WIDTH/2)), (BACK_Y+(BACK_HEIGHT/2)) )
         self.gameDisplay.blit(textBack, recBack)
@@ -208,11 +217,12 @@ class Gui(object):
                 self.click_func = False
 
             elif self.S_bar_func is 1:
-                self.gameDisplay.fill(WHITE)
+                self.gameDisplay.fill(BLACK)
                 self.record_screenloop()
                 self.loop_record()
                 self.stop_record()
                 self.set_back_button()
+
 
             elif self.S_bar_func is 2:
                 print "HELLO WORLD"
@@ -246,7 +256,7 @@ class Gui(object):
             elif self.S_bar_func is 1:
                 print "HELLO WORLD"
                 self.click_func = False
-                
+
         # # Recognizing Functionality:
         # if self.B_bar_func == 1:
         #     if self.S_bar_func == 0:
@@ -294,6 +304,7 @@ class Gui(object):
                 self.init = False
 
             display.update()
+
                 
 if __name__ == "__main__":
     g = Gui()
