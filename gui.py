@@ -81,13 +81,12 @@ class Gui(object):
     def initialise_background(self):
         # background setup
         pygame.display.set_caption('Music Identification and Classification Application (MICA)')
-        bg = image.load(BACKGROUND_IMG)
 
-        self.imgwave_x, self.imgwave_y = bg.get_size()[0] / 2 - self.imgwave_x / 2,\
-                                         bg.get_size()[1] / 2 - self.imgwave_y / 2
+        
+        # print 'x: {}, y: {}'.format(self.imgwave_x, self.imgwave_y)                                         
 
-        self.gameDisplay = display.set_mode(bg.get_size())
-        self.scrrect = self.gameDisplay.blit(bg,(0,0))
+        self.gameDisplay = display.set_mode(self.bg.get_size())
+        self.scrrect = self.gameDisplay.blit(self.bg,(0,0))
         display.flip()
 
     def initialise_menu(self):
@@ -100,7 +99,6 @@ class Gui(object):
         MenuSystem.BORDER_HL = Color(200,200,200,180)
 
         # create menu
-
         self.search_menu  = MenuSystem.Menu('Search',      ('Search with File','Search with Mic','About Search'))
         self.recognize_menu = MenuSystem.Menu('Instrument',    ('Recognize with File','Recognize with Mic','About Recognize'))
         self.accuracy_check_menu   = MenuSystem.Menu('Similarity',    ('Accuracy Check','About Accuracy Check'))
@@ -155,8 +153,21 @@ class Gui(object):
         stopRect.center = ((STOP_X+(STOP_WIDTH/2)), (STOP_Y+(STOP_HEIGHT/2)) )
         self.gameDisplay.blit(textStop, stopRect)
 
-        
+        # back button
+        if BACK_X+BACK_WIDTH > self.mouse[0] > BACK_X and BACK_Y+BACK_HEIGHT > self.mouse[1] > BACK_Y:
+            pygame.draw.rect(self.gameDisplay, WHITE ,(BACK_X,BACK_Y,BACK_WIDTH,BACK_HEIGHT))
+            textBack, recBack = self.text_objects("Back", smallText, BLACK)
+            if self.click[0] == 1:
+                self.recording = False
+                self.click_func = False
+        else:
+            pygame.draw.rect(self.gameDisplay, WHITE,(BACK_X,BACK_Y,BACK_WIDTH,BACK_HEIGHT), 1)
+            textBack, recBack = self.text_objects("Back", smallText, WHITE)
 
+        recBack.center = ((BACK_X+(BACK_WIDTH/2)), (BACK_Y+(BACK_HEIGHT/2)) )
+        self.gameDisplay.blit(textBack, recBack)
+
+        
     def set_recording_variables(self):
         # recording variables setup
         self.recording = False
@@ -207,16 +218,15 @@ class Gui(object):
                 clf_rect.center = ( (CLF_X+(CLF_WIDTH/2)), (CLF_Y+(CLF_HEIGHT/2)) )
                 self.gameDisplay.blit(text_clf, clf_rect)
                 # break
+                self.wf.close()
 
             if event.type == QUIT:
                 if self.record_once:
                     self.p.terminate()
-                    self.wf.close()
+                    # self.wf.close()
                 pygame.quit(); 
                 sys.exit()
 
-            # show the classifying button
-            
 
     def set_menu_bar(self):
         self.ev = event.wait()
@@ -237,40 +247,51 @@ class Gui(object):
                 self.click_func = True
 
 
-    def set_back_button(self):
+    # def set_back_button(self):
 
-        smallText = pygame.font.Font(FONT,16)
+    #     smallText = pygame.font.Font(FONT,16)
 
-        if BACK_X+BACK_WIDTH > self.mouse[0] > BACK_X and BACK_Y+BACK_HEIGHT > self.mouse[1] > BACK_Y:
-            pygame.draw.rect(self.gameDisplay, WHITE ,(BACK_X,BACK_Y,BACK_WIDTH,BACK_HEIGHT))
-            textBack, recBack = self.text_objects("Back", smallText, BLACK)
-            if self.click[0] == 1:
-                self.recording = False
-                self.click_func = False
-        else:
-            pygame.draw.rect(self.gameDisplay, WHITE,(BACK_X,BACK_Y,BACK_WIDTH,BACK_HEIGHT), 1)
-            textBack, recBack = self.text_objects("Back", smallText, WHITE)
+    #     if BACK_X+BACK_WIDTH > self.mouse[0] > BACK_X and BACK_Y+BACK_HEIGHT > self.mouse[1] > BACK_Y:
+    #         pygame.draw.rect(self.gameDisplay, WHITE ,(BACK_X,BACK_Y,BACK_WIDTH,BACK_HEIGHT))
+    #         textBack, recBack = self.text_objects("Back", smallText, BLACK)
+    #         if self.click[0] == 1:
+    #             self.recording = False
+    #             self.click_func = False
+    #     else:
+    #         pygame.draw.rect(self.gameDisplay, WHITE,(BACK_X,BACK_Y,BACK_WIDTH,BACK_HEIGHT), 1)
+    #         textBack, recBack = self.text_objects("Back", smallText, WHITE)
 
-        recBack.center = ((BACK_X+(BACK_WIDTH/2)), (BACK_Y+(BACK_HEIGHT/2)) )
-        self.gameDisplay.blit(textBack, recBack)
+    #     recBack.center = ((BACK_X+(BACK_WIDTH/2)), (BACK_Y+(BACK_HEIGHT/2)) )
+    #     self.gameDisplay.blit(textBack, recBack)
 
 
     def set_classify(self):
         smallText = pygame.font.Font(FONT,16)
-
         if CLF_X+CLF_WIDTH > self.mouse[0] > CLF_X and CLF_Y+CLF_HEIGHT > self.mouse[1] > CLF_Y \
             and not self.recording:
             
+
             pygame.draw.rect(self.gameDisplay, BRIGHT_BLUE,(CLF_X,CLF_Y,CLF_WIDTH,CLF_HEIGHT))
+
+            if self.click[0] == 1 :
+                self.is_classify = True
+
             if self.is_classify:
 
                 text_clf, clf_rect = self.text_objects("Trying...", smallText, BLACK)
             else:
                 text_clf, clf_rect = self.text_objects("Classify", smallText, BLACK)
 
-            if self.click[0] == 1 :
-                self.is_classify = True
-                do
+            clf_rect.center = ((CLF_X+(CLF_WIDTH/2)), (CLF_Y+(CLF_HEIGHT/2)) )
+            self.gameDisplay.blit(text_clf, clf_rect)
+
+            display.flip()
+
+            if self.is_classify is True:
+                self.is_classify = False
+                self.predict = self.clf.predict(WAVE_OUTPUT_FILENAME)
+                print self.predict
+            # print self.is_classify
 
         else:
             pygame.draw.rect(self.gameDisplay, BRIGHT_BLUE,(CLF_X,CLF_Y,CLF_WIDTH,CLF_HEIGHT), 1) 
@@ -279,8 +300,8 @@ class Gui(object):
             else:
                 text_clf, clf_rect = self.text_objects("Classify", smallText, BRIGHT_BLUE)
         
-        clf_rect.center = ((CLF_X+(CLF_WIDTH/2)), (CLF_Y+(CLF_HEIGHT/2)) )
-        self.gameDisplay.blit(text_clf, clf_rect)
+            clf_rect.center = ((CLF_X+(CLF_WIDTH/2)), (CLF_Y+(CLF_HEIGHT/2)) )
+            self.gameDisplay.blit(text_clf, clf_rect)
 
 
     def set_functionality_screen(self):
@@ -296,7 +317,7 @@ class Gui(object):
                 self.record_screenloop()
                 self.loop_record()
                 self.stop_record()
-                self.set_back_button()
+                # self.set_back_button()
 
 
             elif self.S_bar_func is 2:
@@ -314,8 +335,8 @@ class Gui(object):
                 self.record_screenloop()
                 self.loop_record()
                 self.stop_record()
+                # self.set_back_button()
                 self.set_classify()
-                self.set_back_button()
 
             elif self.S_bar_func is 2:
                 print "HELLO WORLD"
@@ -360,6 +381,12 @@ class Gui(object):
 
         self.imgwave = GIFImage("resource/wave1.gif")
         self.imgwave_x, self.imgwave_y = self.imgwave.image.size
+
+        # setting bacground
+        self.bg = image.load(BACKGROUND_IMG)
+
+        self.imgwave_x, self.imgwave_y = self.bg.get_size()[0] / 2 - self.imgwave_x / 2,\
+                                         self.bg.get_size()[1] / 2 - self.imgwave_y / 2
         
 
 
