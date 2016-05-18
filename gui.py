@@ -20,6 +20,7 @@ DISPLAY_WIDTH = 800
 DISPLAY_HEIGHT = 600
 
 FONT = "MenuSystem/Roboto-Regular.ttf"
+RESULT_FONT = "MenuSystem/TanglewoodTales.ttf"
 
 # Recording Configs
 CHUNK = 2048
@@ -39,9 +40,11 @@ BLUE = (25,25,112)
 BRIGHT_RED = (255,0,0)
 BRIGHT_GREEN = (0,255,0)
 BRIGHT_GRAY = (160,160,160)
-BRIGHT_BLUE = (0,102,204)
+BRIGHT_BLUE = (0,249,255)#(0,102,204)
 HALF_DARK_BLUE = (0,76,153)
 FONT_BLUE = (51,153,255)
+BG_COLOR = (0,0,0)#(27,34,39)#(77,96,110)
+ORANGE = (251,177,0)
 
 # Button position
 RECORD_X = 500
@@ -63,6 +66,29 @@ BACK_X = 50
 BACK_Y = 50
 BACK_WIDTH = 80
 BACK_HEIGHT = 40
+
+# PRED_X = 
+# PRED_Y = 
+PRED_WIDTH = 600
+PRED_HEIGHT = 200
+
+# play, pause and stop
+PLAY_X = 310
+PLAY_Y = 450
+PLAY_WIDTH = 80
+PLAY_HEIGHT = 40
+
+PAUSE_X = PLAY_X + 120
+PAUSE_Y = PLAY_Y
+PAUSE_WIDTH = PLAY_WIDTH
+PAUSE_HEIGHT = PLAY_HEIGHT
+
+STP_X = PAUSE_X + 120
+STP_Y = PLAY_Y
+STP_WIDTH = PLAY_WIDTH
+STP_HEIGHT = PLAY_HEIGHT
+
+
 
 # sound wave jif
 # WAVES = [Image.open(join(WAVE_PATH, f)) for f in listdir(WAVE_PATH) if isfile(join(WAVE_PATH, f)) and "wave" in f]
@@ -128,7 +154,8 @@ class Gui(object):
             if self.click[0] == 1 :
                 if self.recording == False:
                     self.open_record()
-                    self.recording = True  
+                    self.recording = True
+                    self.is_predicted = False 
                 self.record_once = True
         else:
             pygame.draw.rect(self.gameDisplay, BRIGHT_RED,(RECORD_X,RECORD_Y,RECORD_WIDTH,RECORD_HEIGHT), 1)
@@ -160,6 +187,7 @@ class Gui(object):
             if self.click[0] == 1:
                 self.recording = False
                 self.click_func = False
+                self.is_predicted = False
         else:
             pygame.draw.rect(self.gameDisplay, WHITE,(BACK_X,BACK_Y,BACK_WIDTH,BACK_HEIGHT), 1)
             textBack, recBack = self.text_objects("Back", smallText, WHITE)
@@ -267,29 +295,34 @@ class Gui(object):
 
     def set_classify(self):
         smallText = pygame.font.Font(FONT,16)
+        predText = pygame.font.Font(RESULT_FONT,48)
         if CLF_X+CLF_WIDTH > self.mouse[0] > CLF_X and CLF_Y+CLF_HEIGHT > self.mouse[1] > CLF_Y \
             and not self.recording:
             
-
             pygame.draw.rect(self.gameDisplay, BRIGHT_BLUE,(CLF_X,CLF_Y,CLF_WIDTH,CLF_HEIGHT))
 
             if self.click[0] == 1 :
-                self.is_classify = True
+                if not self.is_predicted:
+                    self.is_classify = True
 
             if self.is_classify:
 
-                text_clf, clf_rect = self.text_objects("Trying...", smallText, BLACK)
+                text_clf, clf_rect = self.text_objects("Trying...", smallText, BG_COLOR)
             else:
-                text_clf, clf_rect = self.text_objects("Classify", smallText, BLACK)
+                text_clf, clf_rect = self.text_objects("Classify", smallText, BG_COLOR)
 
             clf_rect.center = ((CLF_X+(CLF_WIDTH/2)), (CLF_Y+(CLF_HEIGHT/2)) )
             self.gameDisplay.blit(text_clf, clf_rect)
 
-            display.flip()
+            # if is_predicted:
 
+            if not self.is_predicted:
+                display.flip()
             if self.is_classify is True:
                 self.is_classify = False
+
                 self.predict = self.clf.predict(WAVE_OUTPUT_FILENAME)
+                self.is_predicted = True
                 print self.predict
             # print self.is_classify
 
@@ -302,6 +335,50 @@ class Gui(object):
         
             clf_rect.center = ((CLF_X+(CLF_WIDTH/2)), (CLF_Y+(CLF_HEIGHT/2)) )
             self.gameDisplay.blit(text_clf, clf_rect)
+
+        if self.is_predicted:
+            text_clf, pred_rect = self.text_objects("Instrument: {}".format(self.predict.upper()), predText, ORANGE)
+            pred_rect.center = ((self.imgwave_x - (PRED_WIDTH - self.imgwave_w) / 2+(PRED_WIDTH/2)), 
+                            (self.imgwave_y + 200+(PRED_HEIGHT/2)) )
+            self.gameDisplay.blit(text_clf, pred_rect)
+            # pygame.draw.rect(self.gameDisplay, ORANGE,(self.imgwave_x - (PRED_WIDTH - self.imgwave_w) / 2, \
+                                            # self.imgwave_y + 300, PRED_WIDTH, PRED_HEIGHT), 1)
+            # play 
+            if PLAY_X+PLAY_WIDTH > self.mouse[0] > PLAY_X and PLAY_Y+PLAY_HEIGHT > self.mouse[1] > PLAY_Y:
+
+                pygame.draw.rect(self.gameDisplay, BRIGHT_GREEN,(PLAY_X,PLAY_Y,PLAY_WIDTH,PLAY_HEIGHT))
+                text_play, play_rect = self.text_objects("Play", smallText, BLACK)
+            else:
+                pygame.draw.rect(self.gameDisplay, BRIGHT_GREEN,(PLAY_X,PLAY_Y,PLAY_WIDTH,PLAY_HEIGHT), 1) 
+                text_play, play_rect = self.text_objects("Play", smallText, BRIGHT_GREEN)
+            
+            play_rect.center = ((PLAY_X+(PLAY_WIDTH/2)), (PLAY_Y+(PLAY_HEIGHT/2)) )
+            self.gameDisplay.blit(text_play, play_rect)
+            
+            # pause
+            if PAUSE_X+PAUSE_WIDTH > self.mouse[0] > PAUSE_X and PAUSE_Y+PAUSE_HEIGHT > self.mouse[1] > PAUSE_Y:
+
+                pygame.draw.rect(self.gameDisplay, ORANGE,(PAUSE_X,PAUSE_Y,PAUSE_WIDTH,PAUSE_HEIGHT))
+                text_pause, pause_rect = self.text_objects("Pause", smallText, BLACK)
+            else:
+                pygame.draw.rect(self.gameDisplay, ORANGE,(PAUSE_X,PAUSE_Y,PAUSE_WIDTH,PAUSE_HEIGHT), 1) 
+                text_pause, pause_rect = self.text_objects("Pause", smallText, ORANGE)
+            
+            pause_rect.center = ((PAUSE_X+(PAUSE_WIDTH/2)), (PAUSE_Y+(PAUSE_HEIGHT/2)) )
+            self.gameDisplay.blit(text_pause, pause_rect)
+            
+            # stop
+            if STP_X+STP_WIDTH > self.mouse[0] > STP_X and STP_Y+STP_HEIGHT > self.mouse[1] > STP_Y:
+
+                pygame.draw.rect(self.gameDisplay, BRIGHT_RED,(STP_X,STP_Y,STP_WIDTH,STP_HEIGHT))
+                text_stp, stp_rect = self.text_objects("Stop", smallText, BLACK)
+            else:
+                pygame.draw.rect(self.gameDisplay, BRIGHT_RED,(STP_X,STP_Y,STP_WIDTH,STP_HEIGHT), 1) 
+                text_stp, stp_rect = self.text_objects("Stop", smallText, BRIGHT_RED)
+            stp_rect.center = ((STP_X+(STP_WIDTH/2)), (STP_Y+(STP_HEIGHT/2)) )
+            self.gameDisplay.blit(text_stp, stp_rect)
+            
+
 
 
     def set_functionality_screen(self):
@@ -331,7 +408,7 @@ class Gui(object):
                 self.click_func = False
 
             elif self.S_bar_func is 1:
-                self.gameDisplay.fill(BLACK)
+                self.gameDisplay.fill(BG_COLOR)
                 self.record_screenloop()
                 self.loop_record()
                 self.stop_record()
@@ -368,7 +445,6 @@ class Gui(object):
         #     if self.S_bar_func == 0:
 
 
-
     def __init__(self):
 
         pygame.init()
@@ -378,15 +454,19 @@ class Gui(object):
         self.init = False
 
         self.is_classify = False
+        self.is_predicted = False
+        self.pred_play = False
 
         self.imgwave = GIFImage("resource/wave1.gif")
-        self.imgwave_x, self.imgwave_y = self.imgwave.image.size
+        self.imgwave_w, self.imgwave_h = self.imgwave.image.size
 
         # setting bacground
         self.bg = image.load(BACKGROUND_IMG)
+        self.bg_w, self.bg_h = self.bg.get_size()
 
-        self.imgwave_x, self.imgwave_y = self.bg.get_size()[0] / 2 - self.imgwave_x / 2,\
-                                         self.bg.get_size()[1] / 2 - self.imgwave_y / 2
+        self.imgwave_x, self.imgwave_y = self.bg.get_size()[0] / 2 - self.imgwave_w / 2,\
+                                         self.bg.get_size()[1] / 2 - self.imgwave_h / 2 - 60
+        print self.imgwave_y
         
 
 
