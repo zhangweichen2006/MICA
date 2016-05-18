@@ -81,13 +81,12 @@ class Gui(object):
     def initialise_background(self):
         # background setup
         pygame.display.set_caption('Music Identification and Classification Application (MICA)')
-        bg = image.load(BACKGROUND_IMG)
 
-        self.imgwave_x, self.imgwave_y = bg.get_size()[0] / 2 - self.imgwave_x / 2,\
-                                         bg.get_size()[1] / 2 - self.imgwave_y / 2
+        
+        # print 'x: {}, y: {}'.format(self.imgwave_x, self.imgwave_y)                                         
 
-        self.gameDisplay = display.set_mode(bg.get_size())
-        self.scrrect = self.gameDisplay.blit(bg,(0,0))
+        self.gameDisplay = display.set_mode(self.bg.get_size())
+        self.scrrect = self.gameDisplay.blit(self.bg,(0,0))
         display.flip()
 
     def initialise_menu(self):
@@ -100,7 +99,6 @@ class Gui(object):
         MenuSystem.BORDER_HL = Color(200,200,200,180)
 
         # create menu
-
         self.search_menu  = MenuSystem.Menu('Search',      ('Search with File','Search with Mic','About Search'))
         self.recognize_menu = MenuSystem.Menu('Instrument',    ('Recognize with File','Recognize with Mic','About Recognize'))
         self.accuracy_check_menu   = MenuSystem.Menu('Similarity',    ('Accuracy Check','About Accuracy Check'))
@@ -383,6 +381,12 @@ class Gui(object):
 
         self.imgwave = GIFImage("resource/wave1.gif")
         self.imgwave_x, self.imgwave_y = self.imgwave.image.size
+
+        # setting bacground
+        self.bg = image.load(BACKGROUND_IMG)
+
+        self.imgwave_x, self.imgwave_y = self.bg.get_size()[0] / 2 - self.imgwave_x / 2,\
+                                         self.bg.get_size()[1] / 2 - self.imgwave_y / 2
         
 
 
