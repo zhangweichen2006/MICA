@@ -275,22 +275,22 @@ class Gui(object):
                 self.click_func = True
 
 
-    # def set_back_button(self):
+    def set_back_button(self):
 
-    #     smallText = pygame.font.Font(FONT,16)
+        smallText = pygame.font.Font(FONT,16)
 
-    #     if BACK_X+BACK_WIDTH > self.mouse[0] > BACK_X and BACK_Y+BACK_HEIGHT > self.mouse[1] > BACK_Y:
-    #         pygame.draw.rect(self.gameDisplay, WHITE ,(BACK_X,BACK_Y,BACK_WIDTH,BACK_HEIGHT))
-    #         textBack, recBack = self.text_objects("Back", smallText, BLACK)
-    #         if self.click[0] == 1:
-    #             self.recording = False
-    #             self.click_func = False
-    #     else:
-    #         pygame.draw.rect(self.gameDisplay, WHITE,(BACK_X,BACK_Y,BACK_WIDTH,BACK_HEIGHT), 1)
-    #         textBack, recBack = self.text_objects("Back", smallText, WHITE)
+        if BACK_X+BACK_WIDTH > self.mouse[0] > BACK_X and BACK_Y+BACK_HEIGHT > self.mouse[1] > BACK_Y:
+            pygame.draw.rect(self.gameDisplay, WHITE ,(BACK_X,BACK_Y,BACK_WIDTH,BACK_HEIGHT))
+            textBack, recBack = self.text_objects("Back", smallText, BLACK)
+            if self.click[0] == 1:
+                self.recording = False
+                self.click_func = False
+        else:
+            pygame.draw.rect(self.gameDisplay, WHITE,(BACK_X,BACK_Y,BACK_WIDTH,BACK_HEIGHT), 1)
+            textBack, recBack = self.text_objects("Back", smallText, WHITE)
 
-    #     recBack.center = ((BACK_X+(BACK_WIDTH/2)), (BACK_Y+(BACK_HEIGHT/2)) )
-    #     self.gameDisplay.blit(textBack, recBack)
+        recBack.center = ((BACK_X+(BACK_WIDTH/2)), (BACK_Y+(BACK_HEIGHT/2)) )
+        self.gameDisplay.blit(textBack, recBack)
 
 
     def set_classify(self):
