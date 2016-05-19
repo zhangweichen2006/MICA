@@ -156,6 +156,7 @@ class Gui(object):
                     self.open_record()
                     self.recording = True
                     self.is_predicted = False 
+                    self.is_recorded = False
                 self.record_once = True
         else:
             pygame.draw.rect(self.gameDisplay, BRIGHT_RED,(RECORD_X,RECORD_Y,RECORD_WIDTH,RECORD_HEIGHT), 1)
@@ -188,6 +189,7 @@ class Gui(object):
                 self.recording = False
                 self.click_func = False
                 self.is_predicted = False
+                self.is_recorded = False
         else:
             pygame.draw.rect(self.gameDisplay, WHITE,(BACK_X,BACK_Y,BACK_WIDTH,BACK_HEIGHT), 1)
             textBack, recBack = self.text_objects("Back", smallText, WHITE)
@@ -241,6 +243,7 @@ class Gui(object):
                 self.wf.writeframes(b''.join(self.frames))
                 
                 self.recording = False
+                self.is_recorded = True
                 smallText = pygame.font.Font(FONT,16)
                 text_clf, clf_rect = self.text_objects("Classify", smallText, HALF_DARK_BLUE)
                 clf_rect.center = ( (CLF_X+(CLF_WIDTH/2)), (CLF_Y+(CLF_HEIGHT/2)) )
@@ -343,6 +346,7 @@ class Gui(object):
             self.gameDisplay.blit(text_clf, pred_rect)
             # pygame.draw.rect(self.gameDisplay, ORANGE,(self.imgwave_x - (PRED_WIDTH - self.imgwave_w) / 2, \
                                             # self.imgwave_y + 300, PRED_WIDTH, PRED_HEIGHT), 1)
+        if self.is_recorded:
             # play 
             if PLAY_X+PLAY_WIDTH > self.mouse[0] > PLAY_X and PLAY_Y+PLAY_HEIGHT > self.mouse[1] > PLAY_Y:
 
@@ -456,6 +460,7 @@ class Gui(object):
         self.is_classify = False
         self.is_predicted = False
         self.pred_play = False
+        self.is_recorded = False
 
         self.imgwave = GIFImage("resource/wave1.gif")
         self.imgwave_w, self.imgwave_h = self.imgwave.image.size
