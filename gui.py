@@ -230,7 +230,8 @@ class Gui(object):
     def stop_record(self):
         #stop recording
         for event in pygame.event.get():
-            if STOP_X+STOP_WIDTH > self.mouse[0] > STOP_X and STOP_Y+STOP_WIDTH > self.mouse[1] > STOP_Y and self.recording and self.click[0] == 1 :
+            if STOP_X+STOP_WIDTH > self.mouse[0] > STOP_X and STOP_Y+STOP_WIDTH > self.mouse[1] > STOP_Y and self.recording and self.click[0] == 1 \
+                and self.recording:
                 print("* done recording")
 
                 self.stream.stop_stream()
@@ -250,6 +251,11 @@ class Gui(object):
                 self.gameDisplay.blit(text_clf, clf_rect)
                 # break
                 self.wf.close()
+
+                # loading recorded music
+                if not self.is_music_load:
+                    mixer.music.load(WAVE_OUTPUT_FILENAME)
+                    self.is_music_load = True
 
             if event.type == QUIT:
                 if self.record_once:
@@ -299,53 +305,8 @@ class Gui(object):
     def set_classify(self):
         smallText = pygame.font.Font(FONT,16)
         predText = pygame.font.Font(RESULT_FONT,48)
-        if CLF_X+CLF_WIDTH > self.mouse[0] > CLF_X and CLF_Y+CLF_HEIGHT > self.mouse[1] > CLF_Y \
-            and not self.recording:
-            
-            pygame.draw.rect(self.gameDisplay, BRIGHT_BLUE,(CLF_X,CLF_Y,CLF_WIDTH,CLF_HEIGHT))
 
-            if self.click[0] == 1 :
-                if not self.is_predicted:
-                    self.is_classify = True
-
-            if self.is_classify:
-
-                text_clf, clf_rect = self.text_objects("Trying...", smallText, BG_COLOR)
-            else:
-                text_clf, clf_rect = self.text_objects("Classify", smallText, BG_COLOR)
-
-            clf_rect.center = ((CLF_X+(CLF_WIDTH/2)), (CLF_Y+(CLF_HEIGHT/2)) )
-            self.gameDisplay.blit(text_clf, clf_rect)
-
-            # if is_predicted:
-
-            if not self.is_predicted:
-                display.flip()
-            if self.is_classify is True:
-                self.is_classify = False
-
-                self.predict = self.clf.predict(WAVE_OUTPUT_FILENAME)
-                self.is_predicted = True
-                print self.predict
-            # print self.is_classify
-
-        else:
-            pygame.draw.rect(self.gameDisplay, BRIGHT_BLUE,(CLF_X,CLF_Y,CLF_WIDTH,CLF_HEIGHT), 1) 
-            if self.is_classify:
-                text_clf, clf_rect = self.text_objects("Trying...", smallText, BRIGHT_BLUE)
-            else:
-                text_clf, clf_rect = self.text_objects("Classify", smallText, BRIGHT_BLUE)
-        
-            clf_rect.center = ((CLF_X+(CLF_WIDTH/2)), (CLF_Y+(CLF_HEIGHT/2)) )
-            self.gameDisplay.blit(text_clf, clf_rect)
-
-        if self.is_predicted:
-            text_clf, pred_rect = self.text_objects("Instrument: {}".format(self.predict.upper()), predText, ORANGE)
-            pred_rect.center = ((self.imgwave_x - (PRED_WIDTH - self.imgwave_w) / 2+(PRED_WIDTH/2)), 
-                            (self.imgwave_y + 200+(PRED_HEIGHT/2)) )
-            self.gameDisplay.blit(text_clf, pred_rect)
-            # pygame.draw.rect(self.gameDisplay, ORANGE,(self.imgwave_x - (PRED_WIDTH - self.imgwave_w) / 2, \
-                                            # self.imgwave_y + 300, PRED_WIDTH, PRED_HEIGHT), 1)
+        # control buttons
         if self.is_recorded:
             # play 
             if PLAY_X+PLAY_WIDTH > self.mouse[0] > PLAY_X and PLAY_Y+PLAY_HEIGHT > self.mouse[1] > PLAY_Y:
@@ -381,6 +342,57 @@ class Gui(object):
                 text_stp, stp_rect = self.text_objects("Stop", smallText, BRIGHT_RED)
             stp_rect.center = ((STP_X+(STP_WIDTH/2)), (STP_Y+(STP_HEIGHT/2)) )
             self.gameDisplay.blit(text_stp, stp_rect)
+
+        # Classification process
+        if CLF_X+CLF_WIDTH > self.mouse[0] > CLF_X and CLF_Y+CLF_HEIGHT > self.mouse[1] > CLF_Y \
+            and not self.recording:
+            
+            pygame.draw.rect(self.gameDisplay, BRIGHT_BLUE,(CLF_X,CLF_Y,CLF_WIDTH,CLF_HEIGHT))
+
+            if self.click[0] == 1 :
+                if not self.is_predicted:
+                    self.is_classify = True
+
+            if self.is_classify:
+
+                text_clf, clf_rect = self.text_objects("Trying...", smallText, BG_COLOR)
+            else:
+                text_clf, clf_rect = self.text_objects("Classify", smallText, BG_COLOR)
+
+            clf_rect.center = ((CLF_X+(CLF_WIDTH/2)), (CLF_Y+(CLF_HEIGHT/2)) )
+            self.gameDisplay.blit(text_clf, clf_rect)
+
+            # if is_predicted:
+
+            if not self.is_predicted:
+                display.flip()
+
+            if self.is_classify is True:
+                self.is_classify = False
+
+                self.predict = self.clf.predict(WAVE_OUTPUT_FILENAME)
+                self.is_predicted = True
+                print self.predict
+            # print self.is_classify
+
+        else:
+            pygame.draw.rect(self.gameDisplay, BRIGHT_BLUE,(CLF_X,CLF_Y,CLF_WIDTH,CLF_HEIGHT), 1) 
+            if self.is_classify:
+                text_clf, clf_rect = self.text_objects("Trying...", smallText, BRIGHT_BLUE)
+            else:
+                text_clf, clf_rect = self.text_objects("Classify", smallText, BRIGHT_BLUE)
+        
+            clf_rect.center = ((CLF_X+(CLF_WIDTH/2)), (CLF_Y+(CLF_HEIGHT/2)) )
+            self.gameDisplay.blit(text_clf, clf_rect)
+
+        if self.is_predicted:
+            text_clf, pred_rect = self.text_objects("Instrument: {}".format(self.predict.upper()), predText, ORANGE)
+            pred_rect.center = ((self.imgwave_x - (PRED_WIDTH - self.imgwave_w) / 2+(PRED_WIDTH/2)), 
+                            (self.imgwave_y + 200+(PRED_HEIGHT/2)) )
+            self.gameDisplay.blit(text_clf, pred_rect)
+            # pygame.draw.rect(self.gameDisplay, ORANGE,(self.imgwave_x - (PRED_WIDTH - self.imgwave_w) / 2, \
+                                            # self.imgwave_y + 300, PRED_WIDTH, PRED_HEIGHT), 1)
+        
             
 
 
@@ -451,6 +463,7 @@ class Gui(object):
 
     def __init__(self):
 
+        # basic settups
         pygame.init()
 
         self.clf = Classify()
@@ -461,9 +474,12 @@ class Gui(object):
         self.is_predicted = False
         self.pred_play = False
         self.is_recorded = False
+        self.is_music_load = False
 
         self.imgwave = GIFImage("resource/wave1.gif")
         self.imgwave_w, self.imgwave_h = self.imgwave.image.size
+
+        self.music = None
 
         # setting bacground
         self.bg = image.load(BACKGROUND_IMG)
