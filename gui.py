@@ -13,6 +13,15 @@ from instrument.classify import Classify
 from MenuSystem import MenuSystem
 from MenuSystem.gif import GIFImage
 
+# --------------pathgetter------------------
+from sys import path
+import os.path
+thisrep = os.path.dirname(os.path.abspath(__file__))
+path.append(os.path.dirname(thisrep))
+
+from EasyGame import pathgetter
+
+import sndhdr
 
 # Background Setup
 BACKGROUND_IMG = 'resource/python4.jpg'
@@ -88,6 +97,10 @@ STP_Y = PLAY_Y
 STP_WIDTH = PLAY_WIDTH
 STP_HEIGHT = PLAY_HEIGHT
 
+VALID_X = 155
+VALID_Y = 270
+SELECT_X = 130
+SELECT_Y = 150
 
 
 # sound wave jif
@@ -296,15 +309,23 @@ class Gui(object):
             pygame.draw.rect(self.gameDisplay, WHITE ,(BACK_X,BACK_Y,BACK_WIDTH,BACK_HEIGHT))
             textBack, recBack = self.text_objects("Back", smallText, BLACK)
             if self.click[0] == 1:
-                self.recording = False
+                # self.recording = False
                 self.click_func = False
-                self.music.stop()
         else:
             pygame.draw.rect(self.gameDisplay, WHITE,(BACK_X,BACK_Y,BACK_WIDTH,BACK_HEIGHT), 1)
             textBack, recBack = self.text_objects("Back", smallText, WHITE)
 
         recBack.center = ((BACK_X+(BACK_WIDTH/2)), (BACK_Y+(BACK_HEIGHT/2)) )
         self.gameDisplay.blit(textBack, recBack)
+
+        for event in pygame.event.get():
+
+            if event.type == QUIT:
+                # if self.record_once:
+                    # self.p.terminate()
+                    # self.wf.close()
+                pygame.quit(); 
+                sys.exit()
 
 
     def set_classify(self):
@@ -414,18 +435,42 @@ class Gui(object):
             # pygame.draw.rect(self.gameDisplay, ORANGE,(self.imgwave_x - (PRED_WIDTH - self.imgwave_w) / 2, \
                                             # self.imgwave_y + 300, PRED_WIDTH, PRED_HEIGHT), 1)
         
-            
+    def search_music_with_file(self):
+        smallText = pygame.font.Font(FONT,20)
+        largeText = pygame.font.Font(FONT,36)
+        if not self.isValid:
+            textValidMusic= largeText.render("Please Select A File With Valid Music Type.", 1, WHITE)
+            self.gameDisplay.blit(textValidMusic,(VALID_X,VALID_Y))
+        else:
+            selectMusic= smallText.render("You Selected: {}".format(self.data_source.strip().split("/")[-1]), 1, WHITE)
 
+            self.gameDisplay.blit(selectMusic,(SELECT_X,SELECT_Y))
 
+    def init_file_dialog(self):
+        if (self.data_file == False):
+            self.data_source = pathgetter()
+            print(self.data_source)
+            if self.data_source == "":
+                self.click_func = False
+            elif sndhdr.what(self.data_source) is not None:
+                self.isValid = True
+            else:
+                self.isValid = False
+            self.data_file = True
 
     def set_functionality_screen(self):
-
         # Searching functionality:
+        largeText = pygame.font.Font(FONT,36)
         if self.B_bar_func == 0:
+            #search with file
             if self.S_bar_func is 0:
-                print "HELLO WORLD"
-                self.click_func = False
+                self.gameDisplay.fill(BLACK)
+                # print "HELLO WORLD2"
+                self.set_back_button()
+                self.init_file_dialog()
+                self.search_music_with_file()
 
+            #search with mic
             elif self.S_bar_func is 1:
                 self.gameDisplay.fill(BLACK)
                 self.record_screenloop()
@@ -433,7 +478,7 @@ class Gui(object):
                 self.stop_record()
                 # self.set_back_button()
 
-
+            #about
             elif self.S_bar_func is 2:
                 print "HELLO WORLD"
                 self.click_func = False
@@ -441,8 +486,11 @@ class Gui(object):
         # instrument
         elif self.B_bar_func == 1:
             if self.S_bar_func is 0:
-                print "HELLO WORLD"
-                self.click_func = False
+                self.gameDisplay.fill(BLACK)
+                # print "HELLO WORLD2"
+                self.set_back_button()
+                self.init_file_dialog()
+                self.search_music_with_file()
 
             elif self.S_bar_func is 1:
                 self.gameDisplay.fill(BG_COLOR)
@@ -498,6 +546,9 @@ class Gui(object):
         self.is_music_load = False
         self.is_paused = False
 
+        self.data_file = False
+        self.isValid = False
+
         self.imgwave = GIFImage("resource/wave1.gif")
         self.imgwave_w, self.imgwave_h = self.imgwave.image.size
 
@@ -531,6 +582,7 @@ class Gui(object):
                     self.init = True
                 # set menu bar
                 self.set_menu_bar()
+                self.data_file = False
                 # exit the app
                 # if self.exit_button.update(self.ev):
                 #     if self.exit_button.clicked: break
