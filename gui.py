@@ -14,12 +14,17 @@ from MenuSystem import MenuSystem
 from MenuSystem.gif import GIFImage
 
 # --------------pathgetter------------------
-from sys import path
-import os.path
-thisrep = os.path.dirname(os.path.abspath(__file__))
-path.append(os.path.dirname(thisrep))
+# from sys import path
+# import os.path
+# thisrep = os.path.dirname(os.path.abspath(__file__))
+# path.append(os.path.dirname(thisrep))
 
-from EasyGame import pathgetter
+# from EasyGame import pathgetter
+
+from search.pytkinter import TkFileDialog
+
+import Tkinter, Tkconstants, tkFileDialog
+
 
 import sndhdr
 
@@ -448,17 +453,62 @@ class Gui(object):
 
             self.gameDisplay.blit(selectMusic,(SELECT_X,SELECT_Y))
 
-    def init_file_dialog(self):
-        if (self.data_file == False):
-            self.data_source = pathgetter()
-            # print(self.data_source)
-            if os.path.isfile(self.data_source) and (sndhdr.what(self.data_source) is not None):
-                self.isValid = True
-            else:
-                self.isValid = False
-            self.data_file = True
-        else:
-            self.data_str = self.data_source
+    # def init_file_dialog(self):
+    #     Tkinter.Frame.__init__(self, root)
+
+    #     # options for buttons
+    #     button_opt = {'fill': Tkconstants.BOTH, 'padx': 5, 'pady': 5}
+
+    #     # define buttons
+    #     Tkinter.Button(self, text='askopenfile', command=self.askopenfile).pack(**button_opt)
+    #     Tkinter.Button(self, text='askopenfilename', command=self.askopenfilename).pack(**button_opt)
+    #     Tkinter.Button(self, text='asksaveasfile', command=self.asksaveasfile).pack(**button_opt)
+    #     Tkinter.Button(self, text='asksaveasfilename', command=self.asksaveasfilename).pack(**button_opt)
+    #     Tkinter.Button(self, text='askdirectory', command=self.askdirectory).pack(**button_opt)
+
+    #     # define options for opening or saving a file
+    #     self.file_opt = options = {}
+    #     options['defaultextension'] = '.txt'
+    #     options['filetypes'] = [('all files', '.*'), ('text files', '.txt')]
+    #     options['initialdir'] = 'C:\\'
+    #     options['initialfile'] = 'myfile.txt'
+    #     options['parent'] = root
+    #     options['title'] = 'This is a title'
+
+    #     # This is only available on the Macintosh, and only when Navigation Services are installed.
+    #     #options['message'] = 'message'
+
+    #     # if you use the multiple file version of the module functions this option is set automatically.
+    #     #options['multiple'] = 1
+
+    #     # defining options for opening a directory
+    #     self.dir_opt = options = {}
+    #     options['initialdir'] = 'C:\\'
+    #     options['mustexist'] = False
+    #     options['parent'] = root
+    #     options['title'] = 'This is a title'
+
+    def askopenfilename(self):
+
+        """Returns an opened file in read mode.
+        This time the dialog just returns a filename and the file is opened by your own code.
+        """
+
+        # get filename
+        filename = tkFileDialog.askopenfilename(**self.file_opt)
+
+        # open file on your own
+        if filename:
+          return open(filename, 'r')
+
+    def tk_dialog(self):
+    #     root = Tkinter.Tk()
+        if not self.is_file_selected:
+            self.root.update()
+            self.root.deiconify()
+            TkFileDialog(self.root).pack()
+            self.root.mainloop()
+            self.is_file_selected = True
 
     def reselect(self):
         if RESELECT_X+RESELECT_WIDTH > self.mouse[0] > RESELECT_X and RESELECT_Y+RESELECT_HEIGHT > self.mouse[1] > RESELECT_Y:
@@ -583,16 +633,20 @@ class Gui(object):
         if self.B_bar_func == 0:
             #search with file
             if self.S_bar_func is 0:
+
+                self.tk_dialog()
                 self.gameDisplay.fill(BLACK)
                 # print "HELLO WORLD2"
+                
+                # self.tk_dialog()
+                # from gui12 import *
                 self.set_back_button()
-                self.init_file_dialog()
-                self.search_music_with_file()
-                if self.isValid:
-                    self.reselect()
-                    self.search_similar_music()
-                    # self.play_music()
-                    display.flip()
+                # self.search_music_with_file()
+                # if self.isValid:
+                #     self.reselect()
+                #     self.search_similar_music()
+                #     # self.play_music()
+                #     display.flip()
                 self.search_exit()
 
             #search with mic
@@ -614,7 +668,7 @@ class Gui(object):
                 self.gameDisplay.fill(BLACK)
                 # print "HELLO WORLD2"
                 self.set_back_button()
-                self.init_file_dialog()
+                self.tk_dialog()
                 self.search_music_with_file()
 
             elif self.S_bar_func is 1:
@@ -656,7 +710,9 @@ class Gui(object):
 
 
     def __init__(self):
-
+        #tkinter init
+        self.root = Tkinter.Tk()
+        self.root.withdraw()
         # basic settups
         pygame.init()
 
@@ -676,6 +732,7 @@ class Gui(object):
         self.music_in_database = False
         self.music_found = False
         self.need_reselect = False
+        self.is_file_selected = False
 
         self.smallText = pygame.font.Font(FONT,16)
 
@@ -698,6 +755,11 @@ class Gui(object):
 
         while True:
 
+            for event in pygame.event.get():
+                if event.type == QUIT:
+                    pygame.quit(); 
+                    sys.exit()
+
             self.mouse = pygame.mouse.get_pos()
             self.click = pygame.mouse.get_pressed()
 
@@ -712,6 +774,7 @@ class Gui(object):
                     self.init = True
                 # set menu bar
                 self.set_menu_bar()
+
                 self.data_file = False
                 # exit the app
                 # if self.exit_button.update(self.ev):
