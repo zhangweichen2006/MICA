@@ -1,0 +1,254 @@
+\documentclass[whitelogo,12pt]{tudelft-report}
+\usepackage{natbib}
+\usepackage{changes}
+
+\usepackage{color}
+\definecolor{covercolor}{RGB}{235,250,254}
+
+\begin{document}
+
+%% Use Roman numerals for the page numbers of the title pages and table of
+%% contents.
+\frontmatter
+
+%% Uncomment following 19 lines for a cover with a picture on the lower half only
+ \title[black]{MICA}
+ \subtitle[tudelft-cyan]{Music Identifying and Classifying Application}
+ \author[tudelft-white]{Jiaxi Li\\Weichen Zhang\\Yuan Fang}
+ %\affiliation{Technische Universiteit Delft}
+% \coverimage{cover.jpg}
+ \titleoffsetx{10cm}
+ \titleoffsety{10cm}
+ \afiloffsetx{1cm}
+ \afiloffsety{18cm}
+ %\covertext[tudelft-white]{
+%    \textbf{Cover Text} \\
+%    possibly \\
+%    spanning 
+%    multiple 
+%    lines
+%    \vfill
+%    ISBN 000-00-0000-000-0
+% }
+ \setpagecolor{covercolor}
+ %\makecover
+\let\cleardoublepage\clearpage
+
+%% Uncomment following 16 lines for a cover with a picture on the lower half only
+%\title[tudelft-white]{Title}
+%\subtitle[tudelft-black]{Optional subtitle}
+%\author[tudelft-white]{J.\ Random Author}
+%\affiliation{Technische Universiteit Delft}
+%\coverimage{tank.jpg}
+%\covertext[tudelft-white]{
+%    \textbf{Cover Text} \\
+%    possibly \\
+%    spanning 
+%    multiple 
+%    lines
+%    \vfill
+%    ISBN 000-00-0000-000-0
+%}
+%\setpagecolor{tudelft-cyan}
+%\makecover[split]
+
+
+%% Include an optional title page.
+
+%------------------------------------------------------------------------------------------------------------------------------------
+%
+%							TITLE PAGE
+%
+%------------------------------------------------------------------------------------------------------------------------------------
+\begin{titlepage}
+\begin{center}
+
+%% Insert the TU Delft logo at the bottom of the page.
+
+%% Print the title in cyan.
+{\makeatletter
+\largetitlestyle\fontsize{64}{94}\selectfont\@title
+%\largetitlestyle\color{tudelft-cyan}\Huge\@title
+\makeatother}
+
+%% Print the optional subtitle in black.
+{\makeatletter
+\ifx\@subtitle\undefined\else
+    \bigskip
+   {\tudsffamily\fontsize{22}{32}\selectfont\@subtitle}    
+    %\titlefont\titleshape\LARGE\@subtitle
+\fi
+\makeatother}
+
+\bigskip
+\bigskip
+\bigskip
+\bigskip
+\bigskip
+\bigskip
+
+by
+%door
+
+\bigskip
+\bigskip
+\bigskip
+
+
+%% Print the name of the author.
+{\makeatletter
+%\largetitlefont\Large\bfseries\@author
+\largetitlestyle\fontsize{26}{26}\selectfont\@author
+\makeatother}
+
+\bigskip
+\bigskip
+\bigskip
+\bigskip
+\bigskip
+\bigskip
+
+
+\Large COMP5425
+%ter verkrijging van de graad van Master of Science
+
+Multimedia Retrieval
+%aan de Technische Universiteit Delft,
+
+Project Final Report
+%in het openbaar de verdedigen op dinsdag 1 januari om 10:00 uur.
+
+%\vfill
+\bigskip
+\bigskip
+\bigskip
+\bigskip
+\bigskip
+\bigskip
+\bigskip
+\bigskip
+
+\begin{tabular}{rll}
+    Project Duration: & 6 Weeks\\
+    Project Start Date: 			& 13/04/2016\\
+    Project End Date:   			& 25/05/2016
+\end{tabular}
+%% Only include the following lines if confidentiality is applicable.
+
+\bigskip
+\bigskip
+%\emph{This thesis is confidential and cannot be made public until December 31, 2013.}
+%\emph{Op dit verslag is geheimhouding van toepassing tot en met 31 december 2013.}
+
+\bigskip
+\bigskip
+%An electronic version of this thesis is available at \url{http://repository.tudelft.nl/}.
+%\\[1cm]
+
+%\centering{\includegraphics{cover/logo_black}}
+
+
+\end{center}
+
+%\begin{tikzpicture}[remember picture, overlay]
+%    \node at (current page.south)[anchor=south,inner sep=0pt]{
+%        \includegraphics{cover/logo_black}
+%    };
+%\end{tikzpicture}
+
+\end{titlepage}
+\let\cleardoublepage\clearpage
+
+%\input{preface}
+
+\tableofcontents
+
+%% Use Arabic numerals for the page numbers of the chapters.
+\mainmatter
+
+%------------------------------------------------------------------------------------------------------------------------------------
+%
+%							CONTENT
+%
+%------------------------------------------------------------------------------------------------------------------------------------
+
+%------------------------------------------------------------------------------------------------------------------------------------
+%							INTRODUCTION
+%------------------------------------------------------------------------------------------------------------------------------------
+\chapter{Introduction}
+\section{Motivation}
+The rapid growth in technology is greater than ever nowadays. In this context, music is getting more and more popular, and an increasing number of music has been infiltrated into lives of people and influencing them in different forms. With the development of the network and digitization technology, people are surrounded by music at all times. However, people may enjoy particular music without knowing what this song is or what it consists of. Therefore, identifying songs of interests becomes an executable and reasonable motivation for developing applications to suit this objective.
+
+\section{Project}
+Due the over-variety of music, this project is mainly focusing on Classical Music. There are three major functionality in this deliverable: match incoming music (through files and recordings) with our database, classify instrument played within music (through files and recordings), and rate the music played by yourself.
+
+\subsection{Searching}
+Similar to \textit{Shazam}\footnote{\url{http://www.shazam.com}}, we capture a piece of music clip from either microphone or unrecognized music file, and produce the best matching result in our database.
+
+\subsection{Instrument Classification}
+Beside the music name, what instrument played within music interests people. This project provides the ability of identifying instruments through either an unclassified file or microphone on you computer.
+
+\subsection{Rate Yourself}
+What more than matching and classifying is having the fun by practicing your own skills. Select the favorite  song in the database, and upload personal plays (or through microphone). Then, score will be showing up, and parts that are not played well is pointed out to users on the screen.
+
+%------------------------------------------------------------------------------------------------------------------------------------
+%							Project specification
+%------------------------------------------------------------------------------------------------------------------------------------
+\chapter{Project Specification}
+\section{Group Work}
+The three major functionality, searching, instrument classifying and rating, are divided and assigned to Weichen Zhang, Jiaxi Li, Yuan Fang respectively. While everyone in the group is working individually with his part, GUI integration is conducted by all of the members regards to corresponding functionality.
+
+\section{Related Work}
+Burnett et al. mentioned in \cite{burnett2006}, "an audio fingerprint is a condensed digital summary, deterministically generated from an audio signal, and then can be used to identify audio samples or locate similar items in audio database in a very short time". With this determination of technique, Kim et al. then has proposed an algorithm for extracting music fingerprints directly from the audio signal in \textit{IEEE International Conference} in 2008\cite{kim2008}. Moreover, she had concluded that this proposed algorithm outperformed the conventional state-of-art identification system. After that, there are various methodologies proposed to augment precision and reliability of audio fingerprints.
+\\
+\indent In 2013, Lee et al. \cite{lee2013} pointed out the inefficiency in Haitsma's fingerprint system\cite{kalker2009}. The audio fingerprinting system provided by Haitsma uses a lookup table to identify the candidate songs in the database, which contains the sub-fingerprints of songs, and searches the candidates to find a song whose bit error rate is the lowest. However, the communication between system and database is extremely frequent which can result in the lost of sub-fingerprint duo to heavily degraded input signal. Lee, on the other had, solves this difficulties by reducing the number of database accesses using an partitioned method on each song.
+\\
+\indent In the last few years, audio fingerprint has been successfully applied and developed in repeating pattern detection\cite{chen2015}, speech recognition \cite{sharifi2015}, and audio content recognition\cite{jo2016}.
+\\
+\\
+For the purpose of recognizing instrument, Li et al. compared few approaches of extracting instrument within an audio, including convolutional neural networks (CNN) and Mel-frequency cepstral coefficients (MFCCs) \cite{li2015}. 
+\\
+\indent MFCC computation technique is derived from a type of cepstral representation of the audio clip. It utilizes discrete cosine transform (DCT) for decorrelating log energies of filter bank output \cite{sahidullah2012}. Then resulting log energies and filter banks can be used to calculating a set of coefficients that can best represent an audio. In fact, Bhalke et al. published a paper in \textit{Digital Signal Processing Journal} in 2013 \cite{bhalke2013} and described the combination of higher order moments and MFCC improves recognition accuracy by more than 8\% comparing to convention methodologies.
+
+
+
+
+
+
+%------------------------------------------------------------------------------------------------------------------------------------
+%							Analysis
+%------------------------------------------------------------------------------------------------------------------------------------
+\chapter{Problem Analysis}
+As Ganchev et al. mentioned in \cite{ganchev2005}, different implementations has different performance.
+%------------------------------------------------------------------------------------------------------------------------------------
+%							Implementation
+%------------------------------------------------------------------------------------------------------------------------------------
+\chapter{Implementation}
+
+%------------------------------------------------------------------------------------------------------------------------------------
+%							Discussion
+%------------------------------------------------------------------------------------------------------------------------------------
+\chapter{Discussion}
+\section{Contribution}
+\section{Future Work}
+\section{Reflection on Preparing a Presentation}
+
+
+%------------------------------------------------------------------------------------------------------------------------------------
+%							Conclusion
+%------------------------------------------------------------------------------------------------------------------------------------
+\chapter{Conclusion}
+
+
+
+
+
+%% Use letters for the chapter numbers of the appendices.
+\appendix
+
+%\input{appendix-a}
+
+\bibliography{report}
+
+\end{document}
+
