@@ -13,6 +13,8 @@ from instrument.classify import Classify
 from MenuSystem import MenuSystem
 from MenuSystem.gif import GIFImage
 
+from pydub import AudioSegment
+
 # --------------pathgetter------------------
 from sys import path
 import os.path
@@ -23,8 +25,6 @@ from EasyGame import pathgetter
 
 import sndhdr
 
-# from dejavu import Dejavu
-
 # Background Setup
 BACKGROUND_IMG = 'resource/python4.jpg'
 DISPLAY_WIDTH = 800
@@ -34,7 +34,7 @@ FONT = "MenuSystem/Roboto-Regular.ttf"
 RESULT_FONT = "MenuSystem/TanglewoodTales.ttf"
 
 # Recording Configs
-CHUNK = 2048
+CHUNK = 4096
 FORMAT = pyaudio.paInt16
 CHANNELS = 2
 RATE = 44100
@@ -101,9 +101,21 @@ STP_HEIGHT = PLAY_HEIGHT
 
 VALID_X = 155
 VALID_Y = 270
-SELECT_X = 130
-SELECT_Y = 150
+SELECT_X = 180
+SELECT_Y = 60
 
+RESELECT_X = 450 + SELECT_X
+RESELECT_Y = SELECT_Y - 10
+RESELECT_WIDTH = 80
+RESELECT_HEIGHT = PLAY_HEIGHT
+
+SEARCH_X = 150 + RESELECT_X
+SEARCH_Y = RESELECT_Y
+SEARCH_WIDTH = RESELECT_WIDTH
+SEARCH_HEIGHT = RESELECT_HEIGHT
+
+DBMUSIC_X = SELECT_X - 50
+DBMUSIC_Y = 180 + SELECT_Y
 
 # sound wave jif
 # WAVES = [Image.open(join(WAVE_PATH, f)) for f in listdir(WAVE_PATH) if isfile(join(WAVE_PATH, f)) and "wave" in f]
@@ -114,6 +126,35 @@ SELECT_Y = 150
 # pygame.transform.scale(pygame.image.load(w), (600, 70))
 
 class Gui(object):
+
+    def delete_module(self, modname, paranoid=None):
+        from sys import modules
+        try:
+            thismod = modules[modname]
+        except KeyError:
+            raise ValueError(modname)
+        these_symbols = dir(thismod)
+        if paranoid:
+            try:
+                paranoid[:]  # sequence support
+            except:
+                raise ValueError('must supply a finite list for paranoid')
+            else:
+                these_symbols = paranoid[:]
+        del modules[modname]
+        for mod in modules.values():
+            try:
+                delattr(mod, modname)
+            except AttributeError:
+                pass
+            if paranoid:
+                for symbol in these_symbols:
+                    if symbol[:2] == '__':  # ignore special symbols
+                        continue
+                    try:
+                        delattr(mod, symbol)
+                    except AttributeError:
+                        pass
 
     def text_objects(self, text, font, color):
         textSurface = font.render(text, True, color)
@@ -147,7 +188,7 @@ class Gui(object):
         
         # create bars
         self.bar = MenuSystem.MenuBar()
-        self.bar.set((self.search_menu, self.recognize_menu, self.accuracy_check_menu, self.exit))
+        self.bar.set((self.recognize_menu,self.search_menu, self.accuracy_check_menu, self.exit))
         display.update(self.bar)
 
         self.ms = MenuSystem.MenuSystem()
@@ -158,14 +199,12 @@ class Gui(object):
 
     def record_screenloop(self):
 
-        smallText = pygame.font.Font(FONT,16)
-
         # mouse on GREEN show record button
         if RECORD_X+RECORD_WIDTH > self.mouse[0] > RECORD_X and RECORD_Y+RECORD_HEIGHT > self.mouse[1] > RECORD_Y \
             and not self.recording:
 
             pygame.draw.rect(self.gameDisplay, BRIGHT_RED,(RECORD_X,RECORD_Y,RECORD_WIDTH,RECORD_HEIGHT))
-            textRecord, recRect = self.text_objects("Record", smallText, BLACK)
+            textRecord, recRect = self.text_objects("Record", self.smallText, BLACK)
             if self.click[0] == 1 :
                 if self.recording == False:
                     self.open_record()
@@ -173,11 +212,13 @@ class Gui(object):
                     self.is_predicted = False 
                     self.is_recorded = False
                     self.is_music_load = False
+                    self.music_found = False
+                    self.data_file = False
                     self.music.stop()
                 self.record_once = True
         else:
             pygame.draw.rect(self.gameDisplay, BRIGHT_RED,(RECORD_X,RECORD_Y,RECORD_WIDTH,RECORD_HEIGHT), 1)
-            textRecord, recRect = self.text_objects("Record", smallText, BRIGHT_RED)
+            textRecord, recRect = self.text_objects("Record", self.smallText, BRIGHT_RED)
 
         
         
@@ -189,10 +230,10 @@ class Gui(object):
             and self.recording:
 
             pygame.draw.rect(self.gameDisplay, BRIGHT_GRAY,(STOP_X,STOP_Y,STOP_WIDTH,STOP_HEIGHT))
-            textStop, stopRect = self.text_objects("Stop", smallText, BLACK)
+            textStop, stopRect = self.text_objects("Stop", self.smallText, BLACK)
         else:
             pygame.draw.rect(self.gameDisplay, BRIGHT_GRAY,(STOP_X,STOP_Y,STOP_WIDTH,STOP_HEIGHT), 1) 
-            textStop, stopRect = self.text_objects("Stop", smallText, BRIGHT_GRAY)
+            textStop, stopRect = self.text_objects("Stop", self.smallText, BRIGHT_GRAY)
 
         
         stopRect.center = ((STOP_X+(STOP_WIDTH/2)), (STOP_Y+(STOP_HEIGHT/2)) )
@@ -201,7 +242,7 @@ class Gui(object):
         # back button
         if BACK_X+BACK_WIDTH > self.mouse[0] > BACK_X and BACK_Y+BACK_HEIGHT > self.mouse[1] > BACK_Y:
             pygame.draw.rect(self.gameDisplay, WHITE ,(BACK_X,BACK_Y,BACK_WIDTH,BACK_HEIGHT))
-            textBack, recBack = self.text_objects("Back", smallText, BLACK)
+            textBack, recBack = self.text_objects("Back", self.smallText, BLACK)
             if self.click[0] == 1:
                 self.recording = False
                 self.click_func = False
@@ -211,7 +252,7 @@ class Gui(object):
                 self.music.stop()
         else:
             pygame.draw.rect(self.gameDisplay, WHITE,(BACK_X,BACK_Y,BACK_WIDTH,BACK_HEIGHT), 1)
-            textBack, recBack = self.text_objects("Back", smallText, WHITE)
+            textBack, recBack = self.text_objects("Back", self.smallText, WHITE)
 
         recBack.center = ((BACK_X+(BACK_WIDTH/2)), (BACK_Y+(BACK_HEIGHT/2)) )
         self.gameDisplay.blit(textBack, recBack)
@@ -264,17 +305,12 @@ class Gui(object):
                 
                 self.recording = False
                 self.is_recorded = True
-                smallText = pygame.font.Font(FONT,16)
-                text_clf, clf_rect = self.text_objects("Classify", smallText, HALF_DARK_BLUE)
+                self.smallText = pygame.font.Font(FONT,16)
+                text_clf, clf_rect = self.text_objects("Classify", self.smallText, HALF_DARK_BLUE)
                 clf_rect.center = ( (CLF_X+(CLF_WIDTH/2)), (CLF_Y+(CLF_HEIGHT/2)) )
                 self.gameDisplay.blit(text_clf, clf_rect)
                 # break
                 self.wf.close()
-
-                # loading recorded music
-                if not self.is_music_load:
-                    self.music.load(WAVE_OUTPUT_FILENAME)
-                    self.is_music_load = True
 
             if event.type == QUIT:
                 if self.record_once:
@@ -283,6 +319,66 @@ class Gui(object):
                 pygame.quit(); 
                 sys.exit()
 
+    def play_music_buttons(self, play_music):
+
+        # print(play_music,"   pppp")
+        # loading recorded music
+        if not self.is_music_load:
+            print(play_music)
+            # self.music.load(os.path.join('mp3',play_music))
+            self.music.load(play_music)
+            self.is_music_load = True
+
+        # print(play_music,"   pppp2")
+        # play 
+        if PLAY_X+PLAY_WIDTH > self.mouse[0] > PLAY_X and PLAY_Y+PLAY_HEIGHT > self.mouse[1] > PLAY_Y:
+
+            pygame.draw.rect(self.gameDisplay, BRIGHT_GREEN,(PLAY_X,PLAY_Y,PLAY_WIDTH,PLAY_HEIGHT))
+            text_play, play_rect = self.text_objects("Play", self.smallText, BLACK)
+
+            if self.click[0] == 1:
+                if self.music.get_busy():
+                    self.music.unpause()
+                else:
+                    self.music.play(2)
+
+        else:
+            pygame.draw.rect(self.gameDisplay, BRIGHT_GREEN,(PLAY_X,PLAY_Y,PLAY_WIDTH,PLAY_HEIGHT), 1) 
+            text_play, play_rect = self.text_objects("Play", self.smallText, BRIGHT_GREEN)
+        
+        play_rect.center = ((PLAY_X+(PLAY_WIDTH/2)), (PLAY_Y+(PLAY_HEIGHT/2)) )
+        self.gameDisplay.blit(text_play, play_rect)
+        
+        # pause
+        if PAUSE_X+PAUSE_WIDTH > self.mouse[0] > PAUSE_X and PAUSE_Y+PAUSE_HEIGHT > self.mouse[1] > PAUSE_Y:
+
+            pygame.draw.rect(self.gameDisplay, ORANGE,(PAUSE_X,PAUSE_Y,PAUSE_WIDTH,PAUSE_HEIGHT))
+            text_pause, pause_rect = self.text_objects("Pause", self.smallText, BLACK)
+            
+            if self.click[0] == 1:
+                self.music.pause()
+
+        else:
+            pygame.draw.rect(self.gameDisplay, ORANGE,(PAUSE_X,PAUSE_Y,PAUSE_WIDTH,PAUSE_HEIGHT), 1) 
+            text_pause, pause_rect = self.text_objects("Pause", self.smallText, ORANGE)
+        
+        pause_rect.center = ((PAUSE_X+(PAUSE_WIDTH/2)), (PAUSE_Y+(PAUSE_HEIGHT/2)) )
+        self.gameDisplay.blit(text_pause, pause_rect)
+        
+        # stop
+        if STP_X+STP_WIDTH > self.mouse[0] > STP_X and STP_Y+STP_HEIGHT > self.mouse[1] > STP_Y:
+
+            pygame.draw.rect(self.gameDisplay, BRIGHT_RED,(STP_X,STP_Y,STP_WIDTH,STP_HEIGHT))
+            text_stp, stp_rect = self.text_objects("Stop", self.smallText, BLACK)
+
+            if self.click[0] == 1:
+                self.music.stop()
+
+        else:
+            pygame.draw.rect(self.gameDisplay, BRIGHT_RED,(STP_X,STP_Y,STP_WIDTH,STP_HEIGHT), 1) 
+            text_stp, stp_rect = self.text_objects("Stop", self.smallText, BRIGHT_RED)
+        stp_rect.center = ((STP_X+(STP_WIDTH/2)), (STP_Y+(STP_HEIGHT/2)) )
+        self.gameDisplay.blit(text_stp, stp_rect)
 
     def set_menu_bar(self):
         self.ev = event.wait()
@@ -305,87 +401,46 @@ class Gui(object):
 
     def set_back_button(self):
 
-        smallText = pygame.font.Font(FONT,16)
-
         if BACK_X+BACK_WIDTH > self.mouse[0] > BACK_X and BACK_Y+BACK_HEIGHT > self.mouse[1] > BACK_Y:
             pygame.draw.rect(self.gameDisplay, WHITE ,(BACK_X,BACK_Y,BACK_WIDTH,BACK_HEIGHT))
-            textBack, recBack = self.text_objects("Back", smallText, BLACK)
+            textBack, recBack = self.text_objects("Back", self.smallText, BLACK)
             if self.click[0] == 1:
                 # self.recording = False
                 self.click_func = False
+                self.isValid = False
+                self.music_found = False
+                self.recording = False
+                self.is_predicted = False
+                self.is_recorded = False
+                if self.is_music_load:
+                    self.music.stop()
+                self.is_music_load = False
+
+                #--------new var-------
+                # self.music_in_database = False
+                # self.music_found = False
+                # self.need_reselect = False
+                self.is_file_selected = False
+
+
         else:
             pygame.draw.rect(self.gameDisplay, WHITE,(BACK_X,BACK_Y,BACK_WIDTH,BACK_HEIGHT), 1)
-            textBack, recBack = self.text_objects("Back", smallText, WHITE)
+            textBack, recBack = self.text_objects("Back", self.smallText, WHITE)
 
         recBack.center = ((BACK_X+(BACK_WIDTH/2)), (BACK_Y+(BACK_HEIGHT/2)) )
         self.gameDisplay.blit(textBack, recBack)
 
-        for event in pygame.event.get():
-
-            if event.type == QUIT:
-                # if self.record_once:
-                    # self.p.terminate()
-                    # self.wf.close()
-                pygame.quit(); 
-                sys.exit()
-
 
     def set_classify(self):
-        smallText = pygame.font.Font(FONT,16)
         predText = pygame.font.Font(RESULT_FONT,48)
 
-        # control buttons
+        # file select output
+        if self.is_file_selected:
+            self.play_music_buttons(self.data_source)
+
+        # control buttons (mic output)
         if self.is_recorded:
-
-            # play 
-            if PLAY_X+PLAY_WIDTH > self.mouse[0] > PLAY_X and PLAY_Y+PLAY_HEIGHT > self.mouse[1] > PLAY_Y:
-
-                pygame.draw.rect(self.gameDisplay, BRIGHT_GREEN,(PLAY_X,PLAY_Y,PLAY_WIDTH,PLAY_HEIGHT))
-                text_play, play_rect = self.text_objects("Play", smallText, BLACK)
-
-                if self.click[0] == 1:
-                    if self.music.get_busy():
-                        self.music.unpause()
-                    else:
-                        self.music.play(2)
-
-            else:
-                pygame.draw.rect(self.gameDisplay, BRIGHT_GREEN,(PLAY_X,PLAY_Y,PLAY_WIDTH,PLAY_HEIGHT), 1) 
-                text_play, play_rect = self.text_objects("Play", smallText, BRIGHT_GREEN)
-            
-            play_rect.center = ((PLAY_X+(PLAY_WIDTH/2)), (PLAY_Y+(PLAY_HEIGHT/2)) )
-            self.gameDisplay.blit(text_play, play_rect)
-            
-            # pause
-            if PAUSE_X+PAUSE_WIDTH > self.mouse[0] > PAUSE_X and PAUSE_Y+PAUSE_HEIGHT > self.mouse[1] > PAUSE_Y:
-
-                pygame.draw.rect(self.gameDisplay, ORANGE,(PAUSE_X,PAUSE_Y,PAUSE_WIDTH,PAUSE_HEIGHT))
-                text_pause, pause_rect = self.text_objects("Pause", smallText, BLACK)
-                
-                if self.click[0] == 1:
-                    self.music.pause()
-
-            else:
-                pygame.draw.rect(self.gameDisplay, ORANGE,(PAUSE_X,PAUSE_Y,PAUSE_WIDTH,PAUSE_HEIGHT), 1) 
-                text_pause, pause_rect = self.text_objects("Pause", smallText, ORANGE)
-            
-            pause_rect.center = ((PAUSE_X+(PAUSE_WIDTH/2)), (PAUSE_Y+(PAUSE_HEIGHT/2)) )
-            self.gameDisplay.blit(text_pause, pause_rect)
-            
-            # stop
-            if STP_X+STP_WIDTH > self.mouse[0] > STP_X and STP_Y+STP_HEIGHT > self.mouse[1] > STP_Y:
-
-                pygame.draw.rect(self.gameDisplay, BRIGHT_RED,(STP_X,STP_Y,STP_WIDTH,STP_HEIGHT))
-                text_stp, stp_rect = self.text_objects("Stop", smallText, BLACK)
-
-                if self.click[0] == 1:
-                    self.music.stop()
-
-            else:
-                pygame.draw.rect(self.gameDisplay, BRIGHT_RED,(STP_X,STP_Y,STP_WIDTH,STP_HEIGHT), 1) 
-                text_stp, stp_rect = self.text_objects("Stop", smallText, BRIGHT_RED)
-            stp_rect.center = ((STP_X+(STP_WIDTH/2)), (STP_Y+(STP_HEIGHT/2)) )
-            self.gameDisplay.blit(text_stp, stp_rect)
+            self.play_music_buttons(WAVE_OUTPUT_FILENAME)
 
         # Classification process
         if CLF_X+CLF_WIDTH > self.mouse[0] > CLF_X and CLF_Y+CLF_HEIGHT > self.mouse[1] > CLF_Y \
@@ -399,9 +454,9 @@ class Gui(object):
 
             if self.is_classify:
 
-                text_clf, clf_rect = self.text_objects("Trying...", smallText, BG_COLOR)
+                text_clf, clf_rect = self.text_objects("Trying...", self.smallText, BG_COLOR)
             else:
-                text_clf, clf_rect = self.text_objects("Classify", smallText, BG_COLOR)
+                text_clf, clf_rect = self.text_objects("Classify", self.smallText, BG_COLOR)
 
             clf_rect.center = ((CLF_X+(CLF_WIDTH/2)), (CLF_Y+(CLF_HEIGHT/2)) )
             self.gameDisplay.blit(text_clf, clf_rect)
@@ -422,9 +477,9 @@ class Gui(object):
         else:
             pygame.draw.rect(self.gameDisplay, BRIGHT_BLUE,(CLF_X,CLF_Y,CLF_WIDTH,CLF_HEIGHT), 1) 
             if self.is_classify:
-                text_clf, clf_rect = self.text_objects("Trying...", smallText, BRIGHT_BLUE)
+                text_clf, clf_rect = self.text_objects("Trying...", self.smallText, BRIGHT_BLUE)
             else:
-                text_clf, clf_rect = self.text_objects("Classify", smallText, BRIGHT_BLUE)
+                text_clf, clf_rect = self.text_objects("Classify", self.smallText, BRIGHT_BLUE)
         
             clf_rect.center = ((CLF_X+(CLF_WIDTH/2)), (CLF_Y+(CLF_HEIGHT/2)) )
             self.gameDisplay.blit(text_clf, clf_rect)
@@ -437,62 +492,144 @@ class Gui(object):
             # pygame.draw.rect(self.gameDisplay, ORANGE,(self.imgwave_x - (PRED_WIDTH - self.imgwave_w) / 2, \
                                             # self.imgwave_y + 300, PRED_WIDTH, PRED_HEIGHT), 1)
         
-    def search_music_with_file(self):
-        smallText = pygame.font.Font(FONT,20)
+    def validate_music_with_file(self,func_type):
+        medText = pygame.font.Font(FONT,20)
         largeText = pygame.font.Font(FONT,36)
         if not self.isValid:
             textValidMusic= largeText.render("Please Select A File With Valid Music Type.", 1, WHITE)
             self.gameDisplay.blit(textValidMusic,(VALID_X,VALID_Y))
         else:
-            selectMusic= smallText.render("You Selected: {}".format(self.data_source.strip().split("/")[-1]), 1, WHITE)
+            # print(self.data_source)
+            selectMusic= medText.render("You Selected: {}".format(self.data_source.strip().split("/")[-1]), 1, WHITE)
 
             self.gameDisplay.blit(selectMusic,(SELECT_X,SELECT_Y))
 
-    def init_file_dialog(self):
+        if func_type == 0:
+            self.is_file_selected = True
+
+    def show_file_dialog(self):
         if (self.data_file == False):
             self.data_source = pathgetter()
-            print(self.data_source)
-            if self.data_source == "":
-                self.click_func = False
-            elif sndhdr.what(self.data_source) is not None:
+            # print(self.data_source)
+            if os.path.isfile(self.data_source) and (sndhdr.what(self.data_source) is not None):
                 self.isValid = True
             else:
                 self.isValid = False
             self.data_file = True
+        # else:
+        #     self.data_str = self.data_source
+        # display.flip()
+
+    def reselect(self):
+        if RESELECT_X+RESELECT_WIDTH > self.mouse[0] > RESELECT_X and RESELECT_Y+RESELECT_HEIGHT > self.mouse[1] > RESELECT_Y:
+
+            pygame.draw.rect(self.gameDisplay, BRIGHT_GRAY,(RESELECT_X,RESELECT_Y,RESELECT_WIDTH,RESELECT_HEIGHT))
+            text_reselect, reselect_rect = self.text_objects("Reselect", self.smallText, BLACK)
+
+            if self.click[0] == 1:
+                self.gameDisplay.fill(BLACK)
+                self.data_file = False
+                self.need_reselect = True
+        else:
+            pygame.draw.rect(self.gameDisplay, BRIGHT_GRAY,(RESELECT_X,RESELECT_Y,RESELECT_WIDTH,RESELECT_HEIGHT), 1) 
+            text_reselect, reselect_rect = self.text_objects("Reselect", self.smallText, WHITE)
+        
+        reselect_rect.center = ((RESELECT_X+(RESELECT_WIDTH/2)), (RESELECT_Y+(RESELECT_HEIGHT/2)) )
+        self.gameDisplay.blit(text_reselect, reselect_rect)
+
+        # display.flip()
+
+        if self.need_reselect:
+
+            self.need_reselect = False
+            self.music_found = False
+            self.data_file = False
+
+            #--------new var-------
+            self.is_file_selected = False
+
+            # display.flip()
+
+    def search_similar_music(self,func_type):
+        # display.flip()
+
+        if SEARCH_X+SEARCH_WIDTH > self.mouse[0] > SEARCH_X and SEARCH_Y+SEARCH_HEIGHT > self.mouse[1] > SEARCH_Y:
+
+            pygame.draw.rect(self.gameDisplay, BRIGHT_GREEN,(SEARCH_X,SEARCH_Y,SEARCH_WIDTH,SEARCH_HEIGHT))
+            text_search, search_rect = self.text_objects("Search", self.smallText, BLACK)
+
+            if self.click[0] == 1:
+                if func_type == 0:
+                    msc = self.data_source.strip().split("/")[-1]
+                    print(msc)
+                if func_type == 1:
+                    msc = WAVE_OUTPUT_FILENAME
+
+                from search.search import Recognition
+                # from dejavu import Dejavu
+                # from dejavu.recognize import FileRecognizer
+
+                # config = {"database": {"host": "127.0.0.1", "user": "root", "passwd": "", "db": "dejavu"}}
+                # config = {"database": {"host": "10.66.31.157", "user": "root", "passwd": "662813", "db": "dejavu"}}
+                
+                # djv = Dejavu(config)
+
+                # djv.fingerprint_directory("mp3", [".mp3"], 3)
+
+                # self.dbMusic = djv.recognize(FileRecognizer, msc)
+                g = Recognition()
+                self.dbMusic = g.dejavu(msc)
+
+                if self.dbMusic != "":
+                    self.music_found = True
+
+                for k in [x for x in sys.modules.keys() if x.startswith('search.')]:
+                    del sys.modules[k]
+                del sys.modules['search']
+                # del dejavu
+                
+        else:
+            pygame.draw.rect(self.gameDisplay, BRIGHT_GREEN,(SEARCH_X,SEARCH_Y,SEARCH_WIDTH,SEARCH_HEIGHT), 1) 
+            text_search, search_rect = self.text_objects("Search", self.smallText, BRIGHT_GREEN)
+        
+        search_rect.center = ((SEARCH_X+(SEARCH_WIDTH/2)), (SEARCH_Y+(SEARCH_HEIGHT/2)) )
+        self.gameDisplay.blit(text_search, search_rect)
+
+        if self.music_found:
+            textDatabaseMusic= self.smallText.render("The Relevant Music Found in Database:", 1, WHITE)
+            self.dbMusicName = self.dbMusic['song_name']
+            textDBMusicResult = self.smallText.render("{}".format(self.dbMusicName), 1, WHITE)
+            print(self.dbMusicName)
+            self.gameDisplay.blit(textDatabaseMusic,(DBMUSIC_X,DBMUSIC_Y))
+            self.gameDisplay.blit(textDBMusicResult,(DBMUSIC_X,DBMUSIC_Y+30))
+
+            # print ("wav/{}.wav".format(self.dbMusicName))
+
+            self.play_music_buttons(os.path.join('wav',"{}.wav".format(self.dbMusicName)))
+
+        # del(sys.modules[mod] for mod in sys.modules.keys() if mod.startswith('Recognition'))
+
+    def search_event_handle(self):
+        for event in pygame.event.get():
+            if event.type == QUIT:
+                pygame.quit(); 
+                sys.exit()
 
     def set_functionality_screen(self):
-        # Searching functionality:
+        
+        # instrument
         largeText = pygame.font.Font(FONT,36)
         if self.B_bar_func == 0:
-            #search with file
             if self.S_bar_func is 0:
                 self.gameDisplay.fill(BLACK)
                 # print "HELLO WORLD2"
+                self.show_file_dialog()
+                self.validate_music_with_file(0)
                 self.set_back_button()
-                self.init_file_dialog()
-                self.search_music_with_file()
-
-            #search with mic
-            elif self.S_bar_func is 1:
-                self.gameDisplay.fill(BLACK)
-                self.record_screenloop()
-                self.loop_record()
-                self.stop_record()
-                # self.set_back_button()
-
-            #about
-            elif self.S_bar_func is 2:
-                print "HELLO WORLD"
-                self.click_func = False
-
-        # instrument
-        elif self.B_bar_func == 1:
-            if self.S_bar_func is 0:
-                self.gameDisplay.fill(BLACK)
-                # print "HELLO WORLD2"
-                self.set_back_button()
-                self.init_file_dialog()
-                self.search_music_with_file()
+                if self.isValid:
+                    # self.reselect()
+                    self.set_classify()
+                    display.flip()
 
             elif self.S_bar_func is 1:
                 self.gameDisplay.fill(BG_COLOR)
@@ -502,6 +639,38 @@ class Gui(object):
                 # self.set_back_button()
                 self.set_classify()
 
+            elif self.S_bar_func is 2:
+                print "HELLO WORLD"
+                self.click_func = False
+
+        # Searching functionality:
+        elif self.B_bar_func == 1:
+            #search with file
+            if self.S_bar_func is 0:
+                self.gameDisplay.fill(BLACK)
+                # print "HELLO WORLD2"
+                self.show_file_dialog()
+                self.validate_music_with_file(1)
+                self.set_back_button()
+                if self.isValid:
+                    self.search_similar_music(0)
+                    # self.reselect()
+                    display.flip()
+
+            #search with mic
+            elif self.S_bar_func is 1:
+                self.gameDisplay.fill(BLACK)
+                self.record_screenloop()
+                self.loop_record()
+                self.stop_record()
+                # print(self.music_found)
+                self.search_similar_music(1)
+                display.flip()
+                    # self.reselect()
+                
+                # self.set_back_button()
+
+            #about
             elif self.S_bar_func is 2:
                 print "HELLO WORLD"
                 self.click_func = False
@@ -531,7 +700,6 @@ class Gui(object):
         # if self.B_bar_func == 2:
         #     if self.S_bar_func == 0:
 
-
     def __init__(self):
 
         # basic settups
@@ -551,6 +719,14 @@ class Gui(object):
         self.data_file = False
         self.isValid = False
 
+        #--------new var-------
+        self.music_in_database = False
+        self.music_found = False
+        self.need_reselect = False
+        self.is_file_selected = False
+
+        self.smallText = pygame.font.Font(FONT,16)
+
         self.imgwave = GIFImage("resource/wave1.gif")
         self.imgwave_w, self.imgwave_h = self.imgwave.image.size
 
@@ -563,12 +739,12 @@ class Gui(object):
         self.imgwave_x, self.imgwave_y = self.bg.get_size()[0] / 2 - self.imgwave_w / 2,\
                                          self.bg.get_size()[1] / 2 - self.imgwave_h / 2 - 60
         print self.imgwave_y
-        
-
 
     def main_loop(self):
 
         while True:
+
+            self.search_event_handle()
 
             self.mouse = pygame.mouse.get_pos()
             self.click = pygame.mouse.get_pressed()

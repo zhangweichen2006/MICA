@@ -21,36 +21,36 @@ class Generator:
         self.trainings = defaultdict(list)
 
 
-    def process_audio(self, wavpath, mp3path, typenm):
-        print 'Processing {}...'.format(typenm)
-        if mp3path is not None and listdir(wavpath) == []:
+    def process_audio(self, '../wav/', '../mp3/', 'mp3'):
+        print 'Processing {}...'.format('mp3')
+        if '../mp3/' is not None and listdir('../wav/') == []:
             print 'Convert to wav...'
-            audios_mp3 = [join(mp3path, f) for f in listdir(mp3path) \
-                        if isfile(join(mp3path, f))]
+            audios_mp3 = [join('../mp3/', f) for f in listdir('../mp3/') \
+                        if isfile(join('../mp3/', f))]
 
             for audio in audios_mp3:
                 if '.mp3' in audio:
                     # print audio
-                    mp3_to_wav(audio, typenm)
+                    mp3_to_wav(audio, 'mp3')
 
-        audios = [join(wavpath, f) for f in listdir(wavpath) \
-                    if isfile(join(wavpath, f)) and '.wav' in f]
+        audios = [join('../wav/', f) for f in listdir('../wav/') \
+                    if isfile(join('../wav/', f)) and '.wav' in f]
 
-        for i, audio in enumerate(audios):
+        # for i, audio in enumerate(audios):
 
-            sys.stdout.write('\rProgress: {}/{}'.format(i, len(audios) - 1))
-            sys.stdout.flush()
-            sample_rate, signal = wav.read(audio)
-            signal = trim(signal)
-            coefs = mfcc(signal, samplerate=sample_rate, winlen=0.025, winstep=0.01,
-                ncoef=13, nfilter=26, nfft=2048, lof=0, hif=None, preem=0.97, lift=22)
+        #     sys.stdout.write('\rProgress: {}/{}'.format(i, len(audios) - 1))
+        #     sys.stdout.flush()
+        #     sample_rate, signal = wav.read(audio)
+        #     signal = trim(signal)
+        #     coefs = mfcc(signal, samplerate=sample_rate, winlen=0.025, winstep=0.01,
+        #         ncoef=13, nfilter=26, nfft=2048, lof=0, hif=None, preem=0.97, lift=22)
 
-            features = np.mean(coefs, axis=0)
-            for i, fe in enumerate(features):
-                self.trainings[i].append(fe)
-            self.trainings['class'].append(typenm)
-        print
-        print 'Processing {}...DONE'.format(typenm)
+        #     features = np.mean(coefs, axis=0)
+        #     for i, fe in enumerate(features):
+        #         self.trainings[i].append(fe)
+        #     self.trainings['class'].append('mp3')
+        # print
+        # print 'Processing {}...DONE'.format('mp3')
 
 
     def output(self, filenm):
@@ -192,10 +192,10 @@ def spectrum(frames, nfft):
 
 
 ''' coversion between wav and mp3 '''
-def mp3_to_wav(filenm, typenm):
+def mp3_to_wav(filenm, 'mp3'):
     name = filenm.split(".mp3")
 
-    output = "../raw_data/wav/{}/".format(typenm)
+    output = "../wav/".format('mp3')
     fname = name[0].split("/")[-1]
     output_path = "{}{}.wav".format(output, fname)
 

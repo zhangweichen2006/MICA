@@ -11,10 +11,10 @@ class TkFileDialog(Tkinter.Frame):
 
     # define buttons
     Tkinter.Button(self, text='askopenfile', command=self.askopenfile).pack(**button_opt)
-    Tkinter.Button(self, text='askopenfilename', command=self.askopenfilename).pack(**button_opt)
-    Tkinter.Button(self, text='asksaveasfile', command=self.asksaveasfile).pack(**button_opt)
-    Tkinter.Button(self, text='asksaveasfilename', command=self.asksaveasfilename).pack(**button_opt)
-    Tkinter.Button(self, text='askdirectory', command=self.askdirectory).pack(**button_opt)
+    # Tkinter.Button(self, text='askopenfilename', command=self.askopenfilename).pack(**button_opt)
+    # Tkinter.Button(self, text='asksaveasfile', command=self.asksaveasfile).pack(**button_opt)
+    # Tkinter.Button(self, text='asksaveasfilename', command=self.asksaveasfilename).pack(**button_opt)
+    # Tkinter.Button(self, text='askdirectory', command=self.askdirectory).pack(**button_opt)
 
     # define options for opening or saving a file
     self.file_opt = options = {}
@@ -41,8 +41,9 @@ class TkFileDialog(Tkinter.Frame):
   def askopenfile(self):
 
     """Returns an opened file in read mode."""
+    filename = tkFileDialog.askopenfilename(**self.file_opt)
 
-    return tkFileDialog.askopenfile(mode='r', **self.file_opt)
+    return filename
 
   def askopenfilename(self):
 
