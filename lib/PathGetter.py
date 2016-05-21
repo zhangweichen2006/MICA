@@ -156,7 +156,7 @@ class Browser(Rect):
         else:
             Rect.__init__(self,self.scr.get_rect())
         key.set_repeat(50,50) 
-        display.set_caption("Pygame Images Viewer") 
+        display.set_caption("Select Music File") 
         self.stringpath = form.Form((0,0),0,14)
         self.cancel = Button0(image.load(os.path.join(imagesrep,"cancel.png")))
         self.valid = Button0(image.load(os.path.join(imagesrep,"valid.png")))
