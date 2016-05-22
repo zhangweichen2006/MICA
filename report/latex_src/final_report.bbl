@@ -1,0 +1,88 @@
+\begin{thebibliography}{13}
+\providecommand{\natexlab}[1]{#1}
+\providecommand{\url}[1]{\texttt{#1}}
+\expandafter\ifx\csname urlstyle\endcsname\relax
+  \providecommand{\doi}[1]{doi: #1}\else
+  \providecommand{\doi}{doi: \begingroup \urlstyle{rm}\Url}\fi
+
+\bibitem[Bhalke et~al.(2013)Bhalke, Rao, and Bormane]{bhalke2013}
+DG~Bhalke, CB~Rama Rao, and DS~Bormane.
+\newblock Musical instrument recognition using higher order moments.
+\newblock \emph{Digital Signal Processing}, 5\penalty0 (4):\penalty0 133--138,
+  2013.
+
+\bibitem[Burnett et~al.(2006)Burnett, Pereira, Van~de Walle, and
+  Koenen]{burnett2006}
+Ian~S Burnett, Fernando Pereira, Rik Van~de Walle, and Rob Koenen.
+\newblock \emph{The MPEG-21 book}.
+\newblock Wiley Online Library, 2006.
+
+\bibitem[Chen et~al.(2015)Chen, Xiao, Matsumoto, and Luo]{chen2015}
+Mei Chen, Qingmei Xiao, Kazuyuki Matsumoto, and Xin Luo.
+\newblock Detecting repeating pattern in fingerprint feature sequence.
+\newblock In \emph{2015 Fifth International Conference on Instrumentation and
+  Measurement, Computer, Communication and Control (IMCCC)}, pages 1864--1869.
+  IEEE, 2015.
+
+\bibitem[Ganchev et~al.(2005)Ganchev, Fakotakis, and Kokkinakis]{ganchev2005}
+Todor Ganchev, Nikos Fakotakis, and George Kokkinakis.
+\newblock Comparative evaluation of various mfcc implementations on the speaker
+  verification task.
+\newblock In \emph{Proceedings of the SPECOM}, volume~1, pages 191--194, 2005.
+
+\bibitem[Jo et~al.(2016)Jo, Han, and Kim]{jo2016}
+Jeongseok Jo, Sungjun Han, and Jongweon Kim.
+\newblock Improvement of spectral fingerprint for audio content recognition.
+\newblock 2016.
+
+\bibitem[Kalker and Haitsma(2009)]{kalker2009}
+Antonius Adrianus Cornelis~Maria Kalker and Jaap~Andre Haitsma.
+\newblock Fingerprint database updating method, client and server, April~21
+  2009.
+\newblock US Patent 7,523,312.
+
+\bibitem[Kim et~al.(2008)Kim, Unal, and Narayanan]{kim2008}
+Samuel Kim, Erdem Unal, and Shrikanth Narayanan.
+\newblock Music fingerprint extraction for classical music cover song
+  identification.
+\newblock In \emph{Multimedia and Expo, 2008 IEEE International Conference on},
+  pages 1261--1264. IEEE, 2008.
+
+\bibitem[Lee et~al.(2013)Lee, Yook, and Chang]{lee2013}
+Sunhyung Lee, Dongsuk Yook, and Sukmoon Chang.
+\newblock An efficient audio fingerprint search algorithm for music retrieval.
+\newblock \emph{Consumer Electronics, IEEE Transactions on}, 59\penalty0
+  (3):\penalty0 652--656, 2013.
+
+\bibitem[Li et~al.(2015)Li, Qian, and Wang]{li2015}
+Peter Li, Jiyuan Qian, and Tian Wang.
+\newblock Automatic instrument recognition in polyphonic music using
+  convolutional neural networks.
+\newblock \emph{arXiv preprint arXiv:1511.05520}, 2015.
+
+\bibitem[Milner and Shao(2002)]{milner2002}
+Ben Milner and Xu~Shao.
+\newblock Speech reconstruction from mel-frequency cepstral coefficients using
+  a source-filter model.
+\newblock In \emph{INTERSPEECH}. Citeseer, 2002.
+
+\bibitem[Murty and Yegnanarayana(2006)]{murty2006}
+K~Murty and Bayya Yegnanarayana.
+\newblock Combining evidence from residual phase and mfcc features for speaker
+  recognition.
+\newblock \emph{Signal Processing Letters, IEEE}, 13\penalty0 (1):\penalty0
+  52--55, 2006.
+
+\bibitem[Sahidullah and Saha(2012)]{sahidullah2012}
+Md~Sahidullah and Goutam Saha.
+\newblock Design, analysis and experimental evaluation of block based
+  transformation in mfcc computation for speaker recognition.
+\newblock \emph{Speech Communication}, 54\penalty0 (4):\penalty0 543--565,
+  2012.
+
+\bibitem[Sharifi et~al.(2015)Sharifi, Shahshahani, and Roblek]{sharifi2015}
+Matthew Sharifi, Ben Shahshahani, and Dominik Roblek.
+\newblock Unified recognition of speech and music, December~29 2015.
+\newblock US Patent 9,224,385.
+
+\end{thebibliography}

@@ -1,0 +1,29 @@
+\select@language {english}
+\contentsline {chapter}{\numberline {1}Introduction}{1}{chapter.1}
+\contentsline {section}{\numberline {1.1}Motivation}{1}{section.1.1}
+\contentsline {section}{\numberline {1.2}Project}{1}{section.1.2}
+\contentsline {subsection}{\numberline {1.2.1}Searching}{1}{subsection.1.2.1}
+\contentsline {subsection}{\numberline {1.2.2}Instrument Classification}{1}{subsection.1.2.2}
+\contentsline {subsection}{\numberline {1.2.3}Rate Yourself}{1}{subsection.1.2.3}
+\contentsline {chapter}{\numberline {2}Project Specification}{2}{chapter.2}
+\contentsline {section}{\numberline {2.1}Group Work}{2}{section.2.1}
+\contentsline {section}{\numberline {2.2}Working Environment}{2}{section.2.2}
+\contentsline {subsection}{\numberline {2.2.1}Source Code}{2}{subsection.2.2.1}
+\contentsline {section}{\numberline {2.3}Related Work}{2}{section.2.3}
+\contentsline {section}{\numberline {2.4}Problem Analysis}{3}{section.2.4}
+\contentsline {subsection}{\numberline {2.4.1}Feature Extraction}{3}{subsection.2.4.1}
+\contentsline {subsection}{\numberline {2.4.2}Semi-Real-Time System}{3}{subsection.2.4.2}
+\contentsline {chapter}{\numberline {3}Implementation}{4}{chapter.3}
+\contentsline {section}{\numberline {3.1}Instrument Classification}{4}{section.3.1}
+\contentsline {subsection}{\numberline {3.1.1}MFCCs}{4}{subsection.3.1.1}
+\contentsline {subsection}{\numberline {3.1.2}Storyboard Walk Through}{4}{subsection.3.1.2}
+\contentsline {section}{\numberline {3.2}Searching}{5}{section.3.2}
+\contentsline {subsection}{\numberline {3.2.1}Storyboard Walk Through}{6}{subsection.3.2.1}
+\contentsline {section}{\numberline {3.3}Rating Plays}{6}{section.3.3}
+\contentsline {subsection}{\numberline {3.3.1}Storyboard Walk Through}{6}{subsection.3.3.1}
+\contentsline {chapter}{\numberline {4}Discussion}{8}{chapter.4}
+\contentsline {section}{\numberline {4.1}Contribution}{8}{section.4.1}
+\contentsline {section}{\numberline {4.2}Reflection and Future Work}{8}{section.4.2}
+\contentsline {chapter}{\numberline {5}Conclusion}{9}{chapter.5}
+\contentsline {chapter}{Bibliography}{10}{appendix*.7}
+\contentsfinish 
