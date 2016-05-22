@@ -4,9 +4,11 @@
 
 \usepackage{color}
 \definecolor{covercolor}{RGB}{235,250,254}
+\usepackage{graphicx}
+\graphicspath {{figures/}}
 
 \begin{document}
-
+\captionsetup{justification=centering}
 %% Use Roman numerals for the page numbers of the title pages and table of
 %% contents.
 \frontmatter
@@ -256,7 +258,7 @@ Mel filter bank is generated using 26 triangular filters (standard), and then re
 \begin{figure}
 \centering
 \includegraphics[scale=0.7]{mel_filterbank_example}
-\captionsetup{justification=centering}
+%\captionsetup{justification=centering}
 \caption{Graphical illustration of power spectrum and filter banks.}
 \label{fig:filter}
 \end{figure}
@@ -266,17 +268,105 @@ Next step is doing logarithm on 26 filter bank energies. Once log energies are c
 
 As Li pointed out in \cite{li2015}, after MFCCs of each song in database are computed, we train our data with Random Forest which is a widely used classification technique implemented in $sci$-$kit$ $learn$\footnote{\url{http://scikit-learn.org}}. 
 
-\subsection{GUI}
-\[Insert\_Shots\]
+\subsection{Storyboard Walk Through}
+The walk through for operating instrument classification is shown in Figure~\ref{fig:if} and~\ref{fig:im} from left to right, top to bottom.
+
+\begin{figure}[!htb]
+\minipage{0.497\textwidth}
+  \includegraphics[width=\linewidth]{if1}
+\endminipage\hfill
+\minipage{0.497\textwidth}
+  \includegraphics[width=\linewidth]{if2}
+  %\caption{A really Awesome Image}\label{fig:awesome_image2}
+\endminipage\hfill\\
+
+\minipage{0.497\textwidth}
+  \includegraphics[width=\linewidth]{if3}
+  %\caption{A really Awesome Image}\label{fig:awesome_image2}
+\endminipage\hfill
+\minipage{0.497\textwidth}
+  \includegraphics[width=\linewidth]{if4}
+  %\caption{A really Awesome Image}\label{fig:awesome_image2}
+\endminipage\hfill
+
+\caption{Walk through of Instrument classification by uploading a file. User selects "Instrument by File" in menu, uploads audio file , then clicks on the "Classify" button to reveal played instruments in target audio.}
+\label{fig:if}
+\end{figure}
+
+\begin{figure}[!htb]
+\minipage{0.497\textwidth}
+  \includegraphics[width=\linewidth]{im1}
+\endminipage\hfill
+\minipage{0.497\textwidth}
+  \includegraphics[width=\linewidth]{im2}
+  %\caption{A really Awesome Image}\label{fig:awesome_image2}
+\endminipage\hfill\\
+
+\minipage{0.497\textwidth}
+  \includegraphics[width=\linewidth]{im3}
+  %\caption{A really Awesome Image}\label{fig:awesome_image2}
+\endminipage\hfill
+\minipage{0.497\textwidth}
+  \includegraphics[width=\linewidth]{im4}
+  %\caption{A really Awesome Image}\label{fig:awesome_image2}
+\endminipage\hfill
+
+\caption{Walk through of Instrument classification through microphone. User selects "Instrument by Mic" in menu, records a clip of  audio, then clicks on the "Classify" button to reveal played instruments in target audio.}
+\label{fig:im}
+\end{figure}
 
 \section{Searching}
 Audio fingerprint is generated using a audio fingerprinting and recognition algorithm implemented in $dejavu$\footnote{\url{https://github.com/worldveil/dejavu}}, which can memorize audios by listening to it once and fingerprinting it. Then using resulting fingerprints to match input audio against our database (using $mysql$\footnote{\url{https://www.mysql.com}}).
 
-\subsection{GUI}
-\[Insert\_Shots\]
+\subsection{Storyboard Walk Through}
+The walk through for  using searching function is shown in Figure~\ref{fig:sf} and~\ref{fig:sm} from left to right, top to bottom.
+
+\begin{figure}[!htb]
+\minipage{0.497\textwidth}
+  \includegraphics[width=\linewidth]{sf1}
+\endminipage\hfill
+\minipage{0.497\textwidth}
+  \includegraphics[width=\linewidth]{if2}
+  %\caption{A really Awesome Image}\label{fig:awesome_image2}
+\endminipage\hfill\\
+
+\minipage{0.497\textwidth}
+  \includegraphics[width=\linewidth]{sf3}
+  %\caption{A really Awesome Image}\label{fig:awesome_image2}
+\endminipage\hfill
+\minipage{0.497\textwidth}
+  \includegraphics[width=\linewidth]{sf4}
+  %\caption{A really Awesome Image}\label{fig:awesome_image2}
+\endminipage\hfill
+
+\caption{Walk through of Searching function by uploading a file. User selects "Search by File" in menu, uploads a unknown audio, then click on the "Search" button to reveal matching audio.}
+\label{fig:sf}
+\end{figure}
+
+\begin{figure}[!htb]
+\minipage{0.497\textwidth}
+  \includegraphics[width=\linewidth]{sm1}
+\endminipage\hfill
+\minipage{0.497\textwidth}
+  \includegraphics[width=\linewidth]{sm2}
+  %\caption{A really Awesome Image}\label{fig:awesome_image2}
+\endminipage\hfill\\
+
+\minipage{0.497\textwidth}
+  \includegraphics[width=\linewidth]{sm3}
+  %\caption{A really Awesome Image}\label{fig:awesome_image2}
+\endminipage\hfill
+\minipage{0.497\textwidth}
+  \includegraphics[width=\linewidth]{sm4}
+  %\caption{A really Awesome Image}\label{fig:awesome_image2}
+\endminipage\hfill
+
+\caption{Walk through of Searching function through microphone. User selects "Search by Mic" in menu, records a clip of  audio, then click on the "Search" button to reveal matching audio.}
+\label{fig:sm}
+\end{figure}
 
 \section{Rating Plays}
-\subsection{GUI}
+\subsection{Storyboard Walk Through}
 \[Insert\_Shots\]
 
 %------------------------------------------------------------------------------------------------------------------------------------
